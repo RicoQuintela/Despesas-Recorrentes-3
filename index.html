@@ -131,11 +131,10 @@
     <form class="modal" id="entryForm">
       <button class="close" id="closeEntry" type="button" aria-label="Fechar">×</button>
       <h2>Nova entrada</h2>
-      <p id="entryModalDescription">Registre um valor que será somado automaticamente ao seu orçamento.</p>
-      <button class="secondary" id="editTotalDeposit" type="button">Editar total depositado</button>
-      <label for="newEntryValue" id="newEntryValueLabel">Valor do depósito</label>
+      <p>Registre um valor que será somado automaticamente ao seu orçamento.</p>
+      <label for="newEntryValue">Valor</label>
       <input id="newEntryValue" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" required>
-      <label for="newEntryTitle" id="newEntryTitleLabel">Título (opcional)</label>
+      <label for="newEntryTitle">Título (opcional)</label>
       <input id="newEntryTitle" maxlength="60" placeholder="Ex.: Salário, freelance, reembolso">
       <button class="primary" type="submit">Confirmar</button>
       <button class="secondary" id="cancelEntry" type="button">Cancelar</button>
@@ -383,23 +382,6 @@
       }
       window.addEventListener('keyboardvisibilitychange',event=>{if(!event.detail||!event.detail.visible)commitDueDateOrder()});
       const entryDateText=iso=>{const date=new Date(iso);return Number.isNaN(date.getTime())?'Data não disponível':date.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})+' às '+date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
-      function addDepositToHistory(value,title){
-        const amount=Number(value)||0;
-        if(!(amount>0))return null;
-        const item={id:`entry-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,value:amount,title:title||'Sem título',date:new Date().toISOString(),monthKey:monthBook.active};
-        entries.push(item);
-        return item;
-      }
-      function applyDeposit(value,title){
-        const amount=Number(value)||0;
-        if(!(amount>0)||!addDepositToHistory(amount,title))return false;
-        state.salary=(Number(state.salary)||0)+amount;
-        save();
-        $('salary').value=state.salary?formatInput(state.salary):'';
-        renderTotals();
-        renderEntryHistory();
-        return true;
-      }
       function entryMonthKey(item){
         const key=item&&item.monthKey;
         return key&&monthBook.months[key]?key:monthBook.active;
@@ -688,29 +670,15 @@
         switchMonth(key);
         toast(alreadyExists?`${monthText(key)} aberto.`:`${monthText(key)} criado com os valores zerados.`)
       }
-      $('salary').addEventListener('focus',e=>{e.target.dataset.depositDirty='false';e.target.select()});$('salary').addEventListener('input',e=>{e.target.dataset.depositDirty='true';e.target.value=formatBRLTyping(e.target.value)});$('salary').addEventListener('blur',e=>{const edited=e.target.dataset.depositDirty==='true',amount=parseBRL(e.target.value);delete e.target.dataset.depositDirty;if(edited&&amount>0){applyDeposit(amount,'Sem título');toast('Nova entrada adicionada ao orçamento.')}else e.target.value=state.salary?formatInput(state.salary):''});$('salary').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur()}});
+      $('salary').addEventListener('input',e=>{e.target.value=formatBRLTyping(e.target.value);state.salary=parseBRL(e.target.value);save();renderTotals()});$('salary').addEventListener('blur',e=>{if(state.salary)e.target.value=formatInput(state.salary)});
       $('newCategoryAmount').addEventListener('input',e=>{e.target.value=formatBRLTyping(e.target.value)});$('newEntryValue').addEventListener('input',e=>{e.target.value=formatBRLTyping(e.target.value)});const categoryStatus=$('newCategoryStatus'),categoryDueDay=$('newCategoryDueDay'),syncCategoryStatusColor=()=>{categoryStatus.classList.toggle('status-paid-select',categoryStatus.value==='paid');categoryStatus.classList.toggle('status-pending-select',categoryStatus.value==='pending');categoryStatus.classList.toggle('status-placeholder',!categoryStatus.value)};const syncCategoryDueColor=()=>categoryDueDay.classList.toggle('select-placeholder',!categoryDueDay.value);categoryStatus.addEventListener('change',syncCategoryStatusColor);categoryDueDay.addEventListener('change',syncCategoryDueColor);syncCategoryStatusColor();syncCategoryDueColor();
       const refreshExpenseSearch=()=>{const active=Boolean($('searchExpenseName').dataset.applied?.trim()||$('searchExpenseDue').dataset.applied?.trim());document.querySelector('.app').classList.toggle('searching',active);renderList()};const executeExpenseSearch=input=>{if(!input)return;input.dataset.applied=input.value.trim();input.blur();refreshExpenseSearch();setTimeout(()=>{if(document.activeElement&&document.activeElement!==document.body)document.activeElement.blur()},0)};document.querySelectorAll('.search-icon').forEach(button=>button.addEventListener('click',()=>executeExpenseSearch($(button.dataset.searchTarget))));[$('searchExpenseName'),$('searchExpenseDue')].forEach(input=>{input.addEventListener('input',()=>{const nameInput=$('searchExpenseName'),dueInput=$('searchExpenseDue');if(!nameInput.value.trim()&&!dueInput.value.trim()){delete nameInput.dataset.applied;delete dueInput.dataset.applied;refreshExpenseSearch()}});input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();executeExpenseSearch(input)}})});
       $('addExpense').addEventListener('click',()=>{$('categoryForm').reset();syncCategoryStatusColor();syncCategoryDueColor();$('categoryModal').classList.add('open');setTimeout(()=>$('newCategoryName').focus(),100)});
       const closeCategory=()=>{$('categoryModal').classList.remove('open');$('categoryForm').reset();syncCategoryStatusColor();syncCategoryDueColor()};$('closeCategory').addEventListener('click',closeCategory);$('cancelCategory').addEventListener('click',closeCategory);$('categoryModal').addEventListener('click',e=>{if(e.target===$('categoryModal'))closeCategory()});
       $('categoryForm').addEventListener('submit',e=>{e.preventDefault();const name=$('newCategoryName').value.trim(),dueDay=parseInt($('newCategoryDueDay').value,10),amountText=$('newCategoryAmount').value.trim(),amount=parseBRL(amountText),status=$('newCategoryStatus').value;if(!name){$('newCategoryName').focus();return}if(!Number.isFinite(dueDay)||dueDay<1||dueDay>31){toast('Informe um dia de vencimento entre 1 e 31.');$('newCategoryDueDay').focus();return}if($('newCategoryAmount').value.trim()&&!(amount>0)){toast('Informe um valor válido para a despesa.');$('newCategoryAmount').focus();return}state.categories.push({id:'cat-'+Date.now(),name,icon:'📌',hint:'Categoria personalizada',amount,status,dueDay});save();$('categoryForm').reset();syncCategoryStatusColor();syncCategoryDueColor();renderList();renderTotals();const categoryModal=$('categoryModal'),categoryForm=$('categoryForm');categoryForm.classList.remove('returning');void categoryForm.offsetWidth;categoryForm.classList.add('returning');setTimeout(()=>categoryForm.classList.remove('returning'),1600);toast('Despesa cadastrada com sucesso.');setTimeout(()=>$('newCategoryName').focus(),1200)});
-      let entryMode='add';
-      const setEntryMode=mode=>{
-        entryMode=mode;
-        const editing=mode==='edit-total';
-        $('entryForm').querySelector('h2').textContent=editing?'Editar total depositado':'Novo depósito';
-        $('entryModalDescription').textContent=editing?'Atualize o valor total depositado. Esse ajuste não cria um novo item no histórico.':'Registre um valor que será somado automaticamente ao seu orçamento.';
-        $('newEntryValueLabel').textContent=editing?'Total depositado':'Valor do depósito';
-        $('newEntryTitleLabel').hidden=editing;$('newEntryTitle').hidden=editing;
-        $('editTotalDeposit').textContent=editing?'Voltar para novo depósito':'Editar total depositado';
-        $('entryForm').querySelector('button[type="submit"]').textContent=editing?'Salvar total depositado':'Confirmar';
-        $('newEntryValue').value=editing?(state.salary?formatInput(state.salary):'0,00'):'';
-        if(!editing)$('newEntryTitle').value='';
-      };
-      const closeEntry=()=>{$('entryModal').classList.remove('open');$('entryForm').reset();setEntryMode('add')};
+      const closeEntry=()=>{$('entryModal').classList.remove('open');$('entryForm').reset()};
       const closeHistory=()=>{$('historyModal').classList.remove('open')};
-      $('addIncome').addEventListener('click',()=>{setEntryMode('add');$('entryModal').classList.add('open');setTimeout(()=>$('newEntryValue').focus(),100)});
-      $('editTotalDeposit').addEventListener('click',()=>{setEntryMode(entryMode==='edit-total'?'add':'edit-total');$('newEntryValue').focus();$('newEntryValue').select()});
+      $('addIncome').addEventListener('click',()=>{$('entryModal').classList.add('open');setTimeout(()=>$('newEntryValue').focus(),100)});
       $('closeEntry').addEventListener('click',closeEntry);$('cancelEntry').addEventListener('click',closeEntry);$('entryModal').addEventListener('click',e=>{if(e.target===$('entryModal'))closeEntry()});
       $('openHistory').addEventListener('click',()=>{renderEntryHistory();$('historyModal').classList.add('open')});$('scrollTopAction').addEventListener('click',()=>{document.querySelector('.app').scrollTo({top:0,behavior:'smooth'})});
       
@@ -741,7 +709,7 @@
         }
       });
       $('closeHistory').addEventListener('click',closeHistory);$('closeHistoryBottom').addEventListener('click',closeHistory);$('clearHistory').addEventListener('click',()=>{if(!entries.length){toast('O histórico já está vazio.');return}if(!confirm('Limpar todo o histórico de entradas? Os valores já somados ao orçamento permanecerão nos campos financeiros.'))return;entries=[];save();renderEntryHistory();toast('Histórico limpo.')});$('historyModal').addEventListener('click',e=>{if(e.target===$('historyModal'))closeHistory()});
-      $('entryForm').addEventListener('submit',e=>{e.preventDefault();const value=parseBRL($('newEntryValue').value);if(entryMode==='edit-total'){if(!Number.isFinite(value)||value<0){toast('Informe um total válido.');$('newEntryValue').focus();return}state.salary=value;save();$('salary').value=value?formatInput(value):'';renderTotals();closeEntry();toast('Total depositado atualizado.');return}const title=$('newEntryTitle').value.trim()||'Sem título';if(!(value>0)){toast('Informe um valor válido.');$('newEntryValue').focus();return}applyDeposit(value,title);closeEntry();toast('Nova entrada adicionada ao orçamento.')});
+      $('entryForm').addEventListener('submit',e=>{e.preventDefault();const value=parseBRL($('newEntryValue').value),title=$('newEntryTitle').value.trim()||'Sem título';if(!(value>0)){toast('Informe um valor válido.');$('newEntryValue').focus();return}entries.push({id:'entry-'+Date.now(),value,title,date:new Date().toISOString(),monthKey:monthBook.active});state.salary=(Number(state.salary)||0)+value;save();$('salary').value=formatInput(state.salary);renderTotals();closeEntry();toast('Nova entrada adicionada ao orçamento.')});
       function switchMonth(key){if(!monthBook.months[key])return;if(monthBook.active!==key)monthBook.months[monthBook.active]=state;monthBook.active=key;state=monthBook.months[key];calendarYear=Number(key.slice(0,4));save();updateMonthHeader();$('salary').value=state.salary?formatInput(state.salary):'';renderList();renderTotals();renderCalendar()}
       function undoLastAction(){
         if(!undoStack.length){toast('Não há nenhuma ação para desfazer.');return}
@@ -941,3 +909,4 @@
 </body>
 </html>
  
+
