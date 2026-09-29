@@ -1,4 +1,4 @@
-const VERSION = 'despesas-recorrentes-v1';
+const VERSION = 'despesas-recorrentes-v2';
 const BASE = new URL('./', self.registration.scope);
 const CORE = [
   BASE.href,
