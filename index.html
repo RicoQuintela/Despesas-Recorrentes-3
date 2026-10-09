@@ -360,13 +360,17 @@
         row.addEventListener('pointerup',clear);row.addEventListener('pointercancel',clear);row.addEventListener('pointerleave',clear);
         row.addEventListener('contextmenu',event=>{event.preventDefault();clear();deleteEntry(item)});
       }
+      const entryMonthKey=item=>{
+        if(typeof item.monthKey==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(item.monthKey))return item.monthKey;
+        const date=new Date(item.date);
+        return Number.isNaN(date.getTime())?null:`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+      };
       function renderEntryHistory(){
         const list=$('entryHistoryList'),total=$('historyTotal');
         if(!list||!total)return;
-        const cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-24);
-        const recent=entries.filter(item=>{const date=new Date(item.date);return Number(item.value)>0&&!Number.isNaN(date.getTime())&&date>=cutoff}).sort((a,b)=>new Date(b.date)-new Date(a.date));
-        list.innerHTML=recent.length?recent.map(item=>`<article class="history-item" data-entry-id="${escapeHtml(item.id)}"><div class="history-fields"><span class="history-title" role="button" tabindex="0" aria-label="Editar título de ${escapeHtml(item.title)}">${escapeHtml(item.title)}</span><span class="history-date">${entryDateText(item.date)}</span></div><div class="history-actions"><strong class="history-value" aria-label="Valor do depósito de ${escapeHtml(item.title)}">${formatBRL(item.value)}</strong></div></article>`).join(''):'<div class="history-empty">Nenhuma entrada registrada nos últimos 24 meses.</div>';
-        total.textContent=formatBRL(recent.reduce((sum,item)=>sum+(Number(item.value)||0),0));
+        const monthEntries=entries.filter(item=>Number(item.value)>0&&entryMonthKey(item)===monthBook.active).sort((a,b)=>new Date(b.date)-new Date(a.date));
+        list.innerHTML=monthEntries.length?monthEntries.map(item=>`<article class="history-item" data-entry-id="${escapeHtml(item.id)}"><div class="history-fields"><span class="history-title" role="button" tabindex="0" aria-label="Editar título de ${escapeHtml(item.title)}">${escapeHtml(item.title)}</span><span class="history-date">${entryDateText(item.date)}</span></div><div class="history-actions"><strong class="history-value" aria-label="Valor do depósito de ${escapeHtml(item.title)}">${formatBRL(item.value)}</strong></div></article>`).join(''):`<div class="history-empty">Nenhuma entrada registrada em ${escapeHtml(monthText(monthBook.active))}.</div>`;
+        total.textContent=formatBRL(monthEntries.reduce((sum,item)=>sum+(Number(item.value)||0),0));
         list.querySelectorAll('.history-item').forEach(row=>{
           const item=entries.find(entry=>entry.id===row.dataset.entryId);if(!item)return;
           const title=row.querySelector('.history-title'),value=row.querySelector('.history-value');
@@ -515,9 +519,9 @@
       $('openHistory').setAttribute('aria-controls','historyModal');$('openHistory').addEventListener('click',openHistory);$('scrollTopAction').addEventListener('click',()=>{document.querySelector('.app').scrollTo({top:0,behavior:'smooth'})});
       $('openAnnualSummary').setAttribute('aria-controls','annualSummaryModal');$('openAnnualSummary').addEventListener('click',openAnnualSummary);$('closeAnnualSummary').addEventListener('click',closeAnnualSummary);$('annualSummaryModal').addEventListener('click',event=>{if(event.target===$('annualSummaryModal'))closeAnnualSummary()});$('annualSummaryYear').addEventListener('change',renderAnnualSummary);
       
-      const activateHistoryClose=event=>{event.preventDefault();event.stopPropagation();closeHistory()};$('closeHistory').addEventListener('click',activateHistoryClose);$('clearHistory').addEventListener('click',()=>{if(!entries.length){toast('O histórico já está vazio.');return}if(!confirm('Limpar todo o histórico de entradas? Os valores já somados ao orçamento permanecerão nos campos financeiros.'))return;entries=[];save();renderEntryHistory();toast('Histórico limpo.')});$('historyModal').addEventListener('click',e=>{if(e.target===$('historyModal'))closeHistory()});
+      const activateHistoryClose=event=>{event.preventDefault();event.stopPropagation();closeHistory()};$('closeHistory').addEventListener('click',activateHistoryClose);$('clearHistory').addEventListener('click',()=>{const monthEntries=entries.filter(item=>entryMonthKey(item)===monthBook.active);if(!monthEntries.length){toast('O arquivo deste mês já está vazio.');return}if(!confirm(`Limpar o histórico de entradas de ${monthText(monthBook.active)}? Os valores já somados ao orçamento permanecerão nos campos financeiros.`))return;const monthEntryIds=new Set(monthEntries.map(item=>item.id));entries=entries.filter(item=>!monthEntryIds.has(item.id));save();renderEntryHistory();toast('Arquivo do mês limpo.')});$('historyModal').addEventListener('click',e=>{if(e.target===$('historyModal'))closeHistory()});
       $('entryForm').addEventListener('submit',e=>{e.preventDefault();const value=parseBRL($('newEntryValue').value);const title=$('newEntryTitle').value.trim()||'Sem título';if(!(value>0)){toast('Informe um valor válido.');$('newEntryValue').focus();return}applyDeposit(value,title);closeEntry();toast('Nova entrada adicionada ao orçamento.')});
-      function switchMonth(key){if(!monthBook.months[key])return;if(monthBook.active!==key)monthBook.months[monthBook.active]=state;monthBook.active=key;state=monthBook.months[key];calendarYear=Number(key.slice(0,4));save();updateMonthHeader();$('salary').value=state.salary?formatInput(state.salary):'0,00';renderList();renderTotals();renderCalendar()}
+      function switchMonth(key){if(!monthBook.months[key])return;if(monthBook.active!==key)monthBook.months[monthBook.active]=state;monthBook.active=key;state=monthBook.months[key];calendarYear=Number(key.slice(0,4));save();updateMonthHeader();$('salary').value=state.salary?formatInput(state.salary):'0,00';renderList();renderTotals();renderCalendar();if($('historyModal')?.classList.contains('open'))renderEntryHistory()}
       function undoLastAction(){
         if(!undoStack.length){toast('Não há nenhuma ação para desfazer.');return}
         redoStack.push(clone(snapshot()));
