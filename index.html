@@ -419,13 +419,16 @@
           check();
         });
       }
-      function requestReminderPushSubscriptionId(){
+      function requestReminderPushSubscriptionId(permissionRequestPromise=Promise.resolve('')){
         return withOneSignal(async OneSignal=>{
           let subscription=OneSignal?.User?.PushSubscription;
           if(subscription?.optedIn&&subscription?.id)return subscription.id;
-          const browserPermission='Notification' in window?Notification.permission:'denied';
-          if(browserPermission==='default')await OneSignal?.Notifications?.requestPermission?.();
-          const permissionGranted=('Notification' in window&&Notification.permission==='granted')||OneSignal?.Notifications?.permission===true;
+          let browserPermission='Notification' in window?Notification.permission:'denied';
+          if(browserPermission==='default'){
+            try{await permissionRequestPromise}catch(_){}
+            browserPermission='Notification' in window?Notification.permission:'denied';
+          }
+          const permissionGranted=browserPermission==='granted'||OneSignal?.Notifications?.permission===true;
           if(!permissionGranted)return '';
           subscription=OneSignal?.User?.PushSubscription;
           if(subscription?.optIn)await subscription.optIn();
@@ -971,7 +974,8 @@
         const reminder={id:`reminder-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,categoryId,when:when.toISOString(),repeat,monthDay:repeat==='monthly'?when.getDate():null,message:'',fired:false,pushMessageId:'',pushDueAt:'',createdAt:new Date().toISOString()};
         const savedCategoryId=categoryId,hasFutureDue=when.getTime()>Date.now();
         if(hasFutureDue)activeReminderPushSchedules.add(reminder.id);
-        const pushSubscriptionPromise=hasFutureDue?requestReminderPushSubscriptionId():Promise.resolve('');
+        const permissionRequestPromise=hasFutureDue&&'Notification' in window&&Notification.permission==='default'?Notification.requestPermission().catch(()=>Notification.permission):Promise.resolve('granted');
+        const pushSubscriptionPromise=hasFutureDue?requestReminderPushSubscriptionId(permissionRequestPromise):Promise.resolve('');
         reminderSaveInProgress=true;if(saveButton)saveButton.disabled=true;
         reminders.push(reminder);
         try{saveReminders()}catch(error){reminders.pop();activeReminderPushSchedules.delete(reminder.id);reminderSaveInProgress=false;if(saveButton)saveButton.disabled=false;toast('Não foi possível salvar o lembrete. Confira o armazenamento do navegador e tente novamente.');return}
