@@ -363,6 +363,20 @@
       reminders.forEach(reminder=>{if(reminder&&typeof reminder==='object'&&Object.prototype.hasOwnProperty.call(reminder,'code')){delete reminder.code;removedLegacyReminderCodes=true}});
       if(removedLegacyReminderCodes)localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));
       const saveReminders=()=>localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));
+      let viewedSingleReminderRemoved=false;
+      const viewedReminderParams=new URLSearchParams(window.location.search);
+      const viewedReminderId=viewedReminderParams.get('viewReminderId');
+      if(viewedReminderId){
+        const viewedReminder=reminders.find(item=>item.id===viewedReminderId);
+        if(viewedReminder?.repeat==='once'){
+          reminders=reminders.filter(item=>item.id!==viewedReminderId);
+          saveReminders();
+          viewedSingleReminderRemoved=true;
+        }
+        viewedReminderParams.delete('viewReminderId');
+        const nextQuery=viewedReminderParams.toString();
+        history.replaceState(history.state,'',`${location.pathname}${nextQuery?`?${nextQuery}`:''}${location.hash}`);
+      }
       const remotePushEndpoint='https://despesas-recorrentes-push.ricoquintela74.workers.dev';
       const remotePushProject='despesas-recorrentes';
       const remotePushUrl='https://ricoquintela.github.io/Despesas-Recorrentes-3/';
@@ -423,7 +437,7 @@
           return {scheduled:false};
         }
         try{
-          const result=await remotePushRequest('schedule',{subscriptionId,reminderId:reminder.id,dueAt:due.toISOString(),previousMessageId,project:remotePushProject,expenseName});
+          const result=await remotePushRequest('schedule',{subscriptionId,reminderId:reminder.id,repeat:reminder.repeat,dueAt:due.toISOString(),previousMessageId,project:remotePushProject,expenseName});
           return {scheduled:true,messageId:result.id,dueAt:due.toISOString()};
         }catch(_){if(previousMessageId)await cancelRemoteReminder(previousMessageId);return {scheduled:false}}
       }
@@ -741,6 +755,15 @@
           reminders=reminders.filter(item=>item.id!==id);saveReminders();renderReminderList();renderList();toast('Lembrete excluído.');
         }));
       }
+      function removeOneTimeReminderAfterView(reminderId){
+        const target=reminders.find(item=>item.id===reminderId);
+        if(!target||target.repeat!=='once')return false;
+        reminders=reminders.filter(item=>item.id!==reminderId);
+        saveReminders();
+        renderReminderList();renderList();
+        toast('Lembrete único excluído após a visualização.');
+        return true;
+      }
       let reminderAlertTimer=null;
       function showReminderAlert(reminder,info){
         const alert=$('reminderAlert'),name=$('reminderAlertName'),due=$('reminderAlertDue'),item=info.item;
@@ -758,7 +781,7 @@
         const title=`Lembrete: ${name}`;
         const body=reminder.message||`${name} está programada para agora.`;
         if('Notification' in window&&Notification.permission==='granted'){
-          try{const notification=new Notification(title,{body,tag:`despesa-${reminder.categoryId}`,renotify:true,requireInteraction:true,vibrate:[300,120,300]});notification.onclick=()=>{window.focus();notification.close()}}catch(error){}
+          try{const notification=new Notification(title,{body,tag:`despesa-${reminder.categoryId}`,renotify:true,requireInteraction:true,vibrate:[300,120,300]});notification.onclick=()=>{window.focus();removeOneTimeReminderAfterView(reminder.id);notification.close()}}catch(error){}
         }
         toast(`${title}: ${body}`);
       }
@@ -940,7 +963,7 @@
         renderReminderList();renderList();
         $('reminderForm').reset();renderReminderForm();$('reminderExpense').value=savedCategoryId;updateReminderExpenseDisplay();
         reminderSaveInProgress=false;if(saveButton)saveButton.disabled=false;
-        toast(`Lembrete salvo (${reminders.length}/${REMINDER_LIMIT}).`);
+        toast(`Lembrete salvo (${reminders.length}/${REMINDER_LIMIT}). Aguarde a confirmação do aviso antes de fechar o app.`);
         if(hasFutureDue){
           void (async()=>{
             try{
@@ -1036,6 +1059,7 @@
       if(newAlertVolume){newAlertVolume.value=localStorage.getItem('alertVolume')||'100';if(newAlertVolumeValue)newAlertVolumeValue.textContent=`${newAlertVolume.value}%`;newAlertVolume.addEventListener('input',()=>{localStorage.setItem('alertVolume',newAlertVolume.value);if(newAlertVolumeValue)newAlertVolumeValue.textContent=`${newAlertVolume.value}%`})}
       updateUndoButton();updateMonthHeader();$('salary').value=state.salary?formatInput(state.salary):'0,00';
       renderList();renderTotals();renderCalendar();checkReminders();
+      if(viewedSingleReminderRemoved)toast('Lembrete único excluído após a visualização.');
     })();
   </script>
  
