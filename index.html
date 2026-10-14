@@ -85,8 +85,92 @@
     #historyModal #clearHistory{margin-bottom:18px}
     .annual-summary-modal{max-height:calc(100dvh - 28px);padding-bottom:18px}.annual-summary-year{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0}.annual-summary-year label{flex:0 0 auto;color:#1769ff;font-size:13px;font-weight:800}.annual-summary-year select{width:84px;min-width:84px;padding:7px 8px;border:1px solid #1769ff;border-radius:10px;color:#1769ff;background:var(--white);font-size:12px;font-weight:800;text-align:center}#annualSummaryTitle{color:#007bff!important}#closeAnnualSummary{border:2px solid #e53935!important}.annual-summary-table-wrap{max-height:58vh;overflow:auto;border:2px solid #1769ff;border-radius:11px;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)}.annual-summary-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;white-space:nowrap}.annual-summary-table tbody td{font-size:11px;text-align:center}.annual-summary-table th,.annual-summary-table td{padding:10px 3px;border:1px solid #1769ff;text-align:right;font-variant-numeric:tabular-nums}.annual-summary-table th{position:sticky;top:0;color:var(--ink);background:var(--primary-soft);font-size:12px;font-weight:850;text-align:center}.annual-summary-table th:first-child,.annual-summary-table tbody th{text-align:left;width:20%}.annual-summary-table tbody th{font-weight:800}.annual-summary-table tbody tr:last-child th,.annual-summary-table tbody tr:last-child td{border-bottom:1px solid #1769ff}.annual-summary-note{margin:9px 0 0!important;font-size:10px!important}
     #openHistory,#openAnnualSummary,#addIncome,#addExpense{border:2px solid #1769ff!important;border-radius:14px;color:#1769ff!important;background:#dff1ff!important;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)!important}#addIncome{background:#e4f8ec!important}#addExpense{background:#ffe7eb!important}
+  
+    /* Reminder module restored from the saved version */
+    .expense-icon.reminder-active{border-color:#e8c85b;color:#8a6a00;background:#fff5bf;box-shadow:0 0 0 3px rgba(246,218,105,.24),0 4px 10px rgba(218,183,55,.22)}
+    .expense-icon.reminder-active::before{color:#8a6a00}
+    .reminder-indicator{display:block;width:max-content;margin:0 0 2px;color:#74798b;font-size:12px;line-height:1;font-weight:400}
+    .reminder-mini-clock{position:relative;width:19px;height:19px;margin-top:-4px;border:2px solid #74798b;border-radius:50%;color:#74798b}
+    .reminder-mini-clock .clock-hand{bottom:50%;left:50%;width:1px;background:#74798b}
+    .reminder-mini-clock .clock-hour-hand{height:6px}
+    .reminder-mini-clock .clock-minute-hand{height:8px;width:1px;background:#74798b}
+    .reminder-mini-clock .clock-center-dot{width:4px;height:4px;border:1px solid #74798b;background:#fff}
+    .create-reminder{padding:8px 6px;margin:4px 0;color:#000;background:transparent;font-size:12px;font-weight:800;line-height:1.1;text-decoration:underline}
+    .create-reminder:active{transform:translateY(1px) scale(.98)}
+    .history-actions-row .reminder-trigger{width:150px;margin-top:0}
+    .app.searching #addIncome,.app.searching #addExpense,.app.searching #openHistory,.app.searching #openAnnualSummary,.app.searching #openReminder{display:none}
+    .reminder-alert{position:fixed;z-index:200;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:#000}
+    .reminder-alert.open{display:flex}
+    .reminder-alert-card{width:min(100%,520px);padding:34px 22px;border:2px solid #1769ff;border-radius:18px;background:#000;text-align:center}
+    .reminder-alert-brand,.reminder-alert-name,.reminder-alert-due{display:block;color:#1769ff}
+    .reminder-alert-brand{font-size:clamp(25px,7vw,42px);font-weight:950;letter-spacing:.08em}
+    .reminder-alert-message{margin:24px 0 18px;color:#fff;font-size:clamp(18px,5vw,28px);font-weight:850;line-height:1.25}
+    .reminder-alert-name{font-size:clamp(22px,6vw,34px);font-weight:950;overflow-wrap:anywhere}
+    .reminder-alert-due{margin-top:12px;font-size:clamp(18px,5vw,27px);font-weight:850}
+    .reminder-offset-select{display:block;width:100%;padding:11px 12px;margin:0 0 7px;border:2px solid #000;border-radius:11px;color:#1769ff;background:var(--primary-soft);font-size:13px;font-weight:850;text-align:center;cursor:pointer}
+    .manual-reminder-button{display:block;width:100%;padding:10px 12px;margin:0 0 12px;border:1px solid #000;border-radius:11px;color:#1769ff;background:#fff;font-size:12px;font-weight:800;text-align:center}
+    .manual-reminder-button:active{transform:scale(.99)}
+    .dark-theme .modal input,.dark-theme .modal select,.dark-theme .settings-option select,.dark-theme .expense-search,.dark-theme .expense-amount,.dark-theme .due-control,.dark-theme .status-btn,.dark-theme .month-option,.dark-theme .history-item,.dark-theme .reminder-item,.dark-theme .reminder-clock-picker{background:#242735;color:var(--ink)}
+    .dark-theme .create-reminder,.dark-theme .reminder-expense-display{color:#60a5fa!important;-webkit-text-fill-color:#60a5fa;border-color:#60a5fa!important}
+    .reminder-trigger{margin-top:9px}
+    .reminder-expense-display{padding:10px 12px;margin:0 0 12px;border:2px solid #1769ff;border-radius:11px;color:#1769ff;background:#eef5ff;font-size:14px;font-weight:850;text-align:center}
+    .reminder-modal{padding-bottom:13px}
+    .reminder-modal p{margin-bottom:10px}
+    .reminder-modal label{margin:5px 0 3px;font-size:12px;font-weight:750;letter-spacing:-.01em}
+    .reminder-modal input,.reminder-modal select{padding:8px 10px;font-family:inherit;font-size:13px;font-weight:650}
+    .reminder-modal #reminderOffset,.reminder-modal #reminderDate{border:2px solid #000}
+    .reminder-modal #reminderDate:disabled{border-color:#6b7280;background:#9ca3af;color:#fff;opacity:1;cursor:not-allowed;-webkit-text-fill-color:#fff}
+    .reminder-clock-picker{display:grid;grid-template-columns:58px minmax(0,1fr);align-items:center;gap:11px;padding:10px 11px;border:1px solid #dfe1ef;border-radius:15px;background:linear-gradient(135deg,#fafaff 0%,#f1f0ff 100%);box-shadow:0 4px 10px rgba(65,53,183,.08)}
+    .reminder-clock-face{position:relative;width:56px;height:56px;border:3px solid var(--primary);border-radius:50%;background:#fff;box-shadow:inset 0 0 0 4px #efedff,0 3px 7px rgba(65,53,183,.14)}
+    .reminder-clock-face::before,.reminder-clock-face::after{position:absolute;left:50%;top:4px;color:var(--muted);font-size:7px;font-weight:850;line-height:1;transform:translateX(-50%)}
+    .reminder-clock-face::before{content:'12'}
+    .reminder-clock-face::after{content:'6';top:auto;bottom:4px}
+    .reminder-clock-settings{min-width:0}
+    .reminder-clock-settings strong{display:block;margin-bottom:6px;color:var(--ink);font-size:12px;font-weight:800}
+    .reminder-clock-selects{display:flex;align-items:center;gap:5px}
+    .reminder-clock-selects select{width:64px;padding:7px 6px;border-color:#c9c6f8;color:var(--ink);background:#fff;font-size:16px;font-weight:850;text-align:center}
+    .reminder-clock-selects span{color:var(--primary);font-size:18px;font-weight:900}
+    .reminder-modal .primary{margin-top:11px;padding:11px;color:#fff;background:#d94961}
+    .reminder-modal .secondary{margin-top:5px;padding:10px}
+    .reminder-hint{display:block;margin:6px 2px 0;color:var(--muted);font-size:10px;font-weight:600;line-height:1.35}
+    .reminder-list-title{display:block;margin:10px 2px 4px;color:var(--ink);font-size:12px;font-weight:800}
+    .reminder-list{display:flex;flex-direction:column;gap:6px;overflow:visible;margin:8px 0 2px}
+    .reminder-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:#fcfcfe}
+    .reminder-item.saved-reminder{border-color:#b9b4ff;background:#f0efff}
+    .reminder-item strong{display:block;color:var(--ink);font-size:12px}
+    .reminder-item small{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.35}
+    .reminder-delete{padding:7px 8px;border:1px solid #f1a7b4;border-radius:8px;color:var(--red);background:var(--red-soft);font-size:10px;font-weight:800}
+    .reminder-empty{padding:9px;color:var(--muted);font-size:11px;text-align:center}
+    .reminder-modal{max-height:calc(100dvh - 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+    #reminderModal.open{display:block!important;position:fixed;inset:0;height:100dvh;padding:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y}
+    #reminderModal.open .reminder-modal{display:block;position:relative;width:min(100%,570px);min-height:100dvh;max-height:none!important;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom));overflow:visible!important;border-radius:0}
+    #reminderCount{color:var(--primary)}
+    .reminder-actions{position:sticky;bottom:0;z-index:15;display:grid;grid-template-columns:1fr;padding:10px 0;margin:14px 0 10px;border-top:1px solid var(--line);background:#fff}
+    .reminder-actions .primary{width:100%;padding:12px 8px;margin:0;font-size:12px}
+    #saveReminderButton:disabled{opacity:.65;cursor:wait}
+    #closeReminder{border:2px solid #e53935!important}
+    #reminderExpenseDisplay{margin-bottom:20px}
+    #reminderOffset{margin-bottom:22px}
+    .reminder-modal label[for="reminderDate"],.reminder-modal label[for="reminderHour"],.reminder-modal label[for="reminderRepeat"]{margin:14px 0 10px}
+    #reminderDate{display:block;margin-bottom:22px}
+    .reminder-clock-picker{margin-bottom:22px}
+    #reminderRepeat{margin-bottom:20px}
+    .reminder-modal .reminder-hint{margin:12px 2px 18px}
+    .reminder-modal .reminder-list-title{display:block;margin:16px 0 10px}
+    .reminder-modal .reminder-list{gap:10px;margin:10px 0 18px}
   </style>
-</head>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "e078e43d-0121-444a-a658-b780030a81f4",
+        serviceWorkerPath: "/Despesas-Recorrentes-3/sw.js",
+        serviceWorkerParam: { scope: "/Despesas-Recorrentes-3/" }
+      });
+    });
+  </script>
+  </head>
 <body class="cover-open">
  
   <section class="cover-screen" id="coverScreen" aria-label="Capa do aplicativo">
@@ -156,6 +240,57 @@
       <p class="annual-summary-note">Saldo final = depósitos menos gastos pagos.</p>
     </section>
   </div>
+  <div aria-modal="true" class="modal-backdrop" id="reminderModal" role="dialog">
+    <form class="modal reminder-modal" id="reminderForm">
+      <button class="close" id="closeReminder" type="button" aria-label="Fechar">×</button>
+      <h2>Criar lembrete</h2>
+      <p>O surgimento do lembrete varia conforme o aparelho.</p>
+      <input id="reminderExpense" type="hidden" required><div id="reminderExpenseDisplay" class="reminder-expense-display" aria-live="polite"></div>
+      <select id="reminderOffset" class="reminder-offset-select" aria-label="Me lembrar">
+        <option value="">Me lembrar...</option>
+        <option value="0">No dia do vencimento</option>
+        <option value="1">1 dia antes do vencimento</option>
+        <option value="2">2 dias antes do vencimento</option>
+        <option value="3">3 dias antes do vencimento</option>
+        <option value="4">4 dias antes do vencimento</option>
+        <option value="5">5 dias antes do vencimento</option>
+        <option value="10">10 dias antes do vencimento</option>
+        <option value="15">15 dias antes do vencimento</option>
+      </select>
+      <label for="reminderDate">Ou se preferir, especifique a data.</label>
+      <input id="reminderDate" type="date" required>
+      <label for="reminderHour">Horário do alerta:</label>
+      <div class="reminder-clock-picker">
+        <div class="reminder-clock-face" aria-hidden="true">
+          <span class="clock-hand clock-hour-hand" id="reminderHourHand"></span>
+          <span class="clock-hand clock-minute-hand" id="reminderMinuteHand"></span>
+          <span class="clock-center-dot"></span>
+        </div>
+        <div class="reminder-clock-settings">
+          <strong>Escolha o horário:</strong>
+          <div class="reminder-clock-selects">
+            <select id="reminderHour" aria-label="Hora do alerta"></select>
+            <span>:</span>
+            <select id="reminderMinute" aria-label="Minuto do alerta"></select>
+          </div>
+        </div>
+      </div>
+      <input id="reminderTime" type="hidden">
+            <label for="reminderRepeat">Tipo de lembrete:</label>
+      <select id="reminderRepeat" required>
+        <option value="once">Lembrete único</option>
+        <option value="daily">Recorrente — todos os dias</option>
+        <option value="weekly">Recorrente — toda semana</option>
+        <option value="monthly">Recorrente — todo mês</option>
+      </select>
+      <div class="reminder-actions">
+        <button class="primary" id="saveReminderButton" type="submit">Salvar lembrete</button>
+      </div>
+      <small class="reminder-hint">Uma despesa receberá o ícone de um relógio quando um lembrete for configurado para ela.</small>
+      <strong class="reminder-list-title">Lembretes cadastrados: <span id="reminderCount">0/50</span></strong>
+      <div class="reminder-list" id="reminderList"></div>
+    </form>
+  </div>
   <div aria-modal="true" class="modal-backdrop" id="settingsModal" role="dialog">
     <section class="modal settings-new-screen" aria-labelledby="settingsTitle">
       <button class="close" id="closeSettings" type="button" aria-label="Fechar">×</button>
@@ -165,8 +300,18 @@
           <span class="new-settings-label">Tema do aplicativo</span><button class="new-settings-button" type="button" data-settings-target="themeSettings">Selecionar tema</button>
           <div class="settings-panel" id="themeSettings"><label for="newAppTheme">Escolha o tema</label><select id="newAppTheme"><option value="light">Claro</option><option value="dark">Escuro</option><option value="contrast">Alto contraste</option></select></div>
         </div>
+        <div class="new-settings-control">
+          <span class="new-settings-label">Som do lembrete</span><button class="new-settings-button" type="button" data-settings-target="soundSettings">Selecionar som</button>
+          <div class="settings-panel" id="soundSettings"><label for="newAlertSound">Tipo de som do alarme</label><select id="newAlertSound"><option value="double">Alerta duplo</option><option value="high">Sinal agudo</option><option value="low">Sinal grave</option></select></div>
+        </div>
+        <div class="new-settings-control">
+          <span class="new-settings-label">Volume do lembrete</span>
+          <div class="settings-panel open" id="volumeSettings"><label for="newAlertVolume">Volume: <output id="newAlertVolumeValue">100%</output></label><input id="newAlertVolume" type="range" min="10" max="100" step="5" value="100"></div>
+        </div>
+
       </div>
       <div class="settings-response-box" aria-label="Ações das configurações">
+        <button class="settings-response-button test" id="newTestAlertSound" type="button">Testar som</button>
         <button class="settings-response-button save" id="newSaveSettings" type="button">Salvar configurações</button>
         
         <button class="settings-response-button important" id="newImportantButton" type="button" onclick="document.getElementById('importantScreen').classList.add('open');document.getElementById('settingsModal').classList.remove('open')">O botão mais importante do app</button>
@@ -179,9 +324,18 @@
     </section>
   </div>
   <div class="toast" id="toast"></div>
+  <div class="reminder-alert" id="reminderAlert" role="alertdialog" aria-modal="true" aria-label="Lembrete de pagamento">
+    <div class="reminder-alert-card">
+      <strong class="reminder-alert-brand">BASE QUIN</strong>
+      <p class="reminder-alert-message">Tá te lembrado de pagar a conta:</p>
+      <strong class="reminder-alert-name" id="reminderAlertName"></strong>
+      <span class="reminder-alert-due" id="reminderAlertDue"></span>
+    </div>
+  </div>
+
   <script>
     (() => {
-      const KEY='meus-gastos-lista-v3', OLD_KEY='meus-gastos-lista-v2', MONTHS_KEY='meus-gastos-meses-v1', UNDO_KEY='meus-gastos-desfazer-v1', REDO_KEY='meus-gastos-refazer-v1', CALENDAR_DIMENSIONS_KEY='meus-gastos-calendario-dimensoes-v5';
+      const KEY='meus-gastos-lista-v3', OLD_KEY='meus-gastos-lista-v2', MONTHS_KEY='meus-gastos-meses-v1', UNDO_KEY='meus-gastos-desfazer-v1', REDO_KEY='meus-gastos-refazer-v1', CALENDAR_DIMENSIONS_KEY='meus-gastos-calendario-dimensoes-v5', REMINDERS_KEY='meus-gastos-lembretes-v1';
       const MIN_CALENDAR_YEAR=2026, MAX_CALENDAR_YEAR=2050;
       const ENTRIES_KEY='meus-gastos-entradas-v1';
       const initialCategories=[
@@ -202,9 +356,126 @@
       let state=normalizeMonthData(storedState)||normalizeMonthData(migrated)||{salary:0,categories:initialCategories.map(x=>({...x}))};
       let entries=readStoredJSON(ENTRIES_KEY,[]);
       if(!Array.isArray(entries))entries=[];
-      localStorage.removeItem('meus-gastos-lembretes-v1');
-      localStorage.removeItem('alertSound');
-      localStorage.removeItem('alertVolume');
+      const REMINDER_LIMIT=50;
+      let reminders=readStoredJSON(REMINDERS_KEY,[]);
+      if(!Array.isArray(reminders))reminders=[];
+      let removedLegacyReminderCodes=false;
+      reminders.forEach(reminder=>{if(reminder&&typeof reminder==='object'&&Object.prototype.hasOwnProperty.call(reminder,'code')){delete reminder.code;removedLegacyReminderCodes=true}});
+      if(removedLegacyReminderCodes)localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));
+      const saveReminders=()=>localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));
+      const remotePushEndpoint='https://despesas-recorrentes-push.ricoquintela74.workers.dev';
+      const remotePushProject='despesas-recorrentes';
+      const remotePushUrl='https://ricoquintela.github.io/Despesas-Recorrentes-3/';
+      const activeReminderPushSchedules=new Set();
+      let reminderPushSyncInProgress=false;
+      function withOneSignal(callback,timeoutMs=10000){
+        return new Promise(resolve=>{
+          const deferred=window.OneSignalDeferred;
+          if(!deferred||typeof deferred.push!=='function')return resolve(null);
+          let settled=false;
+          const finish=value=>{if(settled)return;settled=true;clearTimeout(timer);resolve(value)};
+          const timer=setTimeout(()=>finish(null),timeoutMs);
+          deferred.push(async OneSignal=>{try{finish(await callback(OneSignal))}catch(_){finish(null)}});
+        });
+      }
+      async function currentOneSignalSubscriptionId(timeoutMs=10000){
+        return (await withOneSignal(OneSignal=>{
+          const subscription=OneSignal?.User?.PushSubscription;
+          return subscription?.optedIn&&subscription?.id?subscription.id:'';
+        },timeoutMs))||'';
+      }
+      function requestReminderPushSubscriptionId(){
+        return withOneSignal(async OneSignal=>{
+          let subscription=OneSignal?.User?.PushSubscription;
+          if(subscription?.optedIn&&subscription?.id)return subscription.id;
+          const browserPermission='Notification' in window?Notification.permission:'denied';
+          if(browserPermission==='default')await OneSignal?.Notifications?.requestPermission?.();
+          const permissionGranted=('Notification' in window&&Notification.permission==='granted')||OneSignal?.Notifications?.permission===true;
+          if(!permissionGranted)return '';
+          subscription=OneSignal?.User?.PushSubscription;
+          if(subscription?.optIn)await subscription.optIn();
+          const deadline=Date.now()+15000;
+          while(Date.now()<deadline){
+            subscription=OneSignal?.User?.PushSubscription;
+            if(subscription?.optedIn&&subscription?.id)return subscription.id;
+            await new Promise(resolve=>setTimeout(resolve,250));
+          }
+          return '';
+        },45000);
+      }
+      async function remotePushRequest(path,payload){
+        const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);
+        try{
+          const response=await fetch(`${remotePushEndpoint}/${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
+          const result=await response.json().catch(()=>({}));
+          if(!response.ok||!result.ok)throw new Error('remote-push-failed');
+          return result;
+        }finally{clearTimeout(timeout)}
+      }
+      async function cancelRemoteReminder(messageId){
+        if(!messageId)return true;
+        try{const result=await remotePushRequest('cancel',{messageId});return Boolean(result.ok&&result.cancelled)}catch(_){return false}
+      }
+      async function scheduleRemoteReminder(reminder,subscriptionId,previousMessageId=''){
+        const due=new Date(reminder.when),info=reminderInfo(reminder),expenseName=info.item?.name||'Despesa';
+        if(Number.isNaN(due.getTime())||due.getTime()<=Date.now()||reminder.fired||!subscriptionId){
+          if(previousMessageId)await cancelRemoteReminder(previousMessageId);
+          return {scheduled:false};
+        }
+        try{
+          const result=await remotePushRequest('schedule',{subscriptionId,reminderId:reminder.id,dueAt:due.toISOString(),previousMessageId,project:remotePushProject,expenseName});
+          return {scheduled:true,messageId:result.id,dueAt:due.toISOString()};
+        }catch(_){if(previousMessageId)await cancelRemoteReminder(previousMessageId);return {scheduled:false}}
+      }
+      async function syncUnscheduledRemoteReminders(){
+        if(reminderPushSyncInProgress)return;
+        reminderPushSyncInProgress=true;
+        try{
+          const subscriptionId=await currentOneSignalSubscriptionId();
+          if(!subscriptionId)return;
+          let changed=false;
+          for(const reminder of reminders){
+            if(reminder.fired||reminder.pushMessageId||activeReminderPushSchedules.has(reminder.id))continue;
+            const due=new Date(reminder.when);
+            if(Number.isNaN(due.getTime())||due.getTime()<=Date.now())continue;
+            const result=await scheduleRemoteReminder(reminder,subscriptionId);
+            if(result.scheduled){reminder.pushMessageId=result.messageId;reminder.pushDueAt=result.dueAt;changed=true}
+          }
+          if(changed){saveReminders();renderReminderList()}
+        }finally{reminderPushSyncInProgress=false}
+      }
+      window.OneSignalDeferred.push(async OneSignal=>{
+        const subscription=OneSignal?.User?.PushSubscription;
+        if(subscription?.addEventListener)subscription.addEventListener('change',()=>{void syncUnscheduledRemoteReminders()});
+        if(subscription?.optedIn&&subscription?.id)void syncUnscheduledRemoteReminders();
+      });
+      let reminderAudioContext=null;
+      function primeReminderAudio(){
+        const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+        if(!AudioContextClass)return;
+        try{
+          if(!reminderAudioContext)reminderAudioContext=new AudioContextClass();
+          if(reminderAudioContext.state==='suspended')reminderAudioContext.resume().catch(()=>{});
+        }catch(error){reminderAudioContext=null}
+      }
+      function playReminderSound(soundOverride=null,volumeOverride=null){
+        primeReminderAudio();
+        const context=reminderAudioContext;
+        if(!context)return;
+        try{
+          if(context.state==='suspended')context.resume().catch(()=>{});
+          const sound=soundOverride||localStorage.getItem('alertSound')||'double', volume=Math.max(.1,Math.min(1,Number(volumeOverride??localStorage.getItem('alertVolume')??100)/100)),start=context.currentTime;
+          const patterns={double:[660,520],high:[880,1046],low:[330,262]},freqs=patterns[sound]||patterns.double;
+          freqs.forEach((frequency,index)=>{
+            const begin=start+index*.32,duration=.3,gain=context.createGain(),oscillator=context.createOscillator();
+            gain.gain.setValueAtTime(.0001,begin);gain.gain.exponentialRampToValueAtTime((index? .68:.82)*volume,begin+.025);gain.gain.exponentialRampToValueAtTime(.0001,begin+duration);
+            oscillator.type=sound==='low'?'triangle':'sine';oscillator.frequency.setValueAtTime(frequency,begin);oscillator.connect(gain);gain.connect(context.destination);oscillator.start(begin);oscillator.stop(begin+duration);
+          });
+        }catch(error){}
+      }
+      document.addEventListener('pointerdown',primeReminderAudio,{once:true,passive:true});
+      document.addEventListener('touchstart',primeReminderAudio,{once:true,passive:true});
+      document.addEventListener('keydown',primeReminderAudio,{once:true});
       let monthBook=readStoredJSON(MONTHS_KEY,null);
       if(!monthBook||typeof monthBook!=='object'||Array.isArray(monthBook))monthBook={active:baseCurrentKey,months:{}};
       if(!monthBook.months||typeof monthBook.months!=='object'||Array.isArray(monthBook.months))monthBook.months={};
@@ -389,15 +660,142 @@
         return {salary:0,categories:source.map(item=>({...item,amount:0,status:'pending'}))};
       }
  
+      function reminderInfo(reminder){
+        const index=state.categories.findIndex(item=>item.id===reminder.categoryId);
+        const item=index>=0?state.categories[index]:null;
+        return {item};
+      }
+      function reminderScheduleText(value){
+        const date=new Date(value);
+        return Number.isNaN(date.getTime())?'Data inválida':date.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})+' às '+date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      }
+      function reminderRepeatText(value){
+        return value==='daily'?'Recorrente: todos os dias':value==='weekly'?'Recorrente: toda semana':value==='monthly'?'Recorrente: todo mês':'Lembrete único';
+      }
+      function nextReminderWhen(value,repeat,monthlyDay=null){
+        const date=new Date(value);
+        if(repeat==='daily')date.setDate(date.getDate()+1);
+        else if(repeat==='weekly')date.setDate(date.getDate()+7);
+        else if(repeat==='monthly'){
+          const day=Math.min(Math.max(Number(monthlyDay)||date.getDate(),1),31);
+          date.setDate(1);date.setMonth(date.getMonth()+1);
+          const lastDay=new Date(date.getFullYear(),date.getMonth()+1,0).getDate();
+          date.setDate(Math.min(day,lastDay));
+        }
+        return date.toISOString();
+      }
+      function syncReminderClock(){
+        const hourInput=$('reminderHour'),minuteInput=$('reminderMinute'),timeInput=$('reminderTime');
+        if(!hourInput||!minuteInput||!timeInput)return;
+        const hour=Number(hourInput.value)||0,minute=Number(minuteInput.value)||0;
+        timeInput.value=`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+        $('reminderHourHand')?.style.setProperty('--clock-angle',`${(hour%12)*30+minute*.5}deg`);
+        $('reminderMinuteHand')?.style.setProperty('--clock-angle',`${minute*6}deg`);
+      }
+      function updateReminderExpenseDisplay(){const display=$('reminderExpenseDisplay'),id=$('reminderExpense')?.value,item=state.categories.find(category=>category.id===id);if(display)display.textContent=item?`Despesa: ${item.name}`:'Despesa não encontrada';}
+      function applyReminderOffset(){
+        const offsetValue=$('reminderOffset')?.value,item=state.categories.find(category=>category.id===$('reminderExpense')?.value),dateInput=$('reminderDate');
+        if(!dateInput)return;
+        const hasOffset=offsetValue!=='';
+        dateInput.disabled=hasOffset;
+        dateInput.setAttribute('aria-disabled',hasOffset?'true':'false');
+        dateInput.title=hasOffset?'A data é calculada automaticamente pela opção escolhida.':'';
+        if(!hasOffset||!item)return;
+        const offset=Number(offsetValue);
+        if(!Number.isFinite(offset))return;
+        const now=new Date();let year=now.getFullYear(),month=now.getMonth(),due=Number(item.dueDay)||now.getDate();
+        const makeReminderDate=(y,m)=>{const dueDate=new Date(y,m,Math.min(Math.max(due,1),new Date(y,m+1,0).getDate()));dueDate.setDate(dueDate.getDate()-offset);return dueDate};
+        let reminderDate=makeReminderDate(year,month);const hour=Number($('reminderHour')?.value)||0,minute=Number($('reminderMinute')?.value)||0;
+        if(new Date(reminderDate.getFullYear(),reminderDate.getMonth(),reminderDate.getDate(),hour,minute)<=now)reminderDate=makeReminderDate(year,month+1);
+        dateInput.value=`${reminderDate.getFullYear()}-${String(reminderDate.getMonth()+1).padStart(2,'0')}-${String(reminderDate.getDate()).padStart(2,'0')}`;
+      }
+      function renderReminderForm(){
+        const select=$('reminderExpense'),dateInput=$('reminderDate'),timeInput=$('reminderTime'),hourInput=$('reminderHour'),minuteInput=$('reminderMinute'),repeatInput=$('reminderRepeat'),offsetInput=$('reminderOffset');
+        if(!select||!dateInput||!timeInput||!hourInput||!minuteInput||!repeatInput)return;
+        if(!select.value)select.value=state.categories[0]?.id||'';updateReminderExpenseDisplay();
+        if(!hourInput.options.length)hourInput.innerHTML=Array.from({length:24},(_,index)=>`<option value="${String(index).padStart(2,'0')}">${String(index).padStart(2,'0')}</option>`).join('');
+        if(!minuteInput.options.length)minuteInput.innerHTML=Array.from({length:60},(_,index)=>`<option value="${String(index).padStart(2,'0')}">${String(index).padStart(2,'0')}</option>`).join('');
+        const now=new Date(),next=new Date(Date.now()+60*60*1000);next.setSeconds(0,0);
+        dateInput.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        hourInput.value=String(next.getHours()).padStart(2,'0');
+        minuteInput.value=String(next.getMinutes()).padStart(2,'0');
+        repeatInput.value='once';
+        if(offsetInput)offsetInput.value='';
+        dateInput.disabled=false;
+        dateInput.setAttribute('aria-disabled','false');
+        dateInput.title='';
+        syncReminderClock();
+        dateInput.min=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-${String(new Date().getDate()).padStart(2,'0')}`;
+      }
+      function renderReminderList(){
+        const list=$('reminderList');if(!list)return;
+        const count=$('reminderCount');if(count)count.textContent=`${reminders.length}/${REMINDER_LIMIT}`;
+        const sorted=[...reminders].sort((a,b)=>new Date(a.when)-new Date(b.when));
+        list.innerHTML=sorted.length?sorted.map(reminder=>{
+          const info=reminderInfo(reminder),name=info.item?info.item.name:'Despesa não encontrada',status=reminder.fired?' — já exibido':'',repeat=reminderRepeatText(reminder.repeat);
+          return `<div class="reminder-item saved-reminder"><div><strong>${escapeHtml(name)}</strong><small>${reminderScheduleText(reminder.when)}<br>${escapeHtml(repeat)}${status}${reminder.message?`<br>${escapeHtml(reminder.message)}`:''}</small></div><button type="button" class="reminder-delete" data-reminder-id="${escapeHtml(reminder.id)}">Excluir</button></div>`;
+        }).join(''):'<div class="reminder-empty">Nenhum lembrete programado.</div>';
+        list.querySelectorAll('.reminder-delete').forEach(button=>button.addEventListener('click',async()=>{
+          const id=button.dataset.reminderId,reminder=reminders.find(item=>item.id===id);
+          if(reminder?.pushMessageId)await cancelRemoteReminder(reminder.pushMessageId);
+          reminders=reminders.filter(item=>item.id!==id);saveReminders();renderReminderList();renderList();toast('Lembrete excluído.');
+        }));
+      }
+      let reminderAlertTimer=null;
+      function showReminderAlert(reminder,info){
+        const alert=$('reminderAlert'),name=$('reminderAlertName'),due=$('reminderAlertDue'),item=info.item;
+        if(!alert)return;
+        name.textContent=item?.name||'Despesa não encontrada';
+        due.textContent=item?.dueDay?`Vencimento: dia ${item.dueDay}`:'Vencimento não informado';
+        alert.classList.add('open');
+        clearTimeout(reminderAlertTimer);
+        reminderAlertTimer=setTimeout(()=>alert.classList.remove('open'),7000);
+      }
+      function showReminderNotification(reminder){
+        playReminderSound();
+        const info=reminderInfo(reminder),name=info.item?info.item.name:'Despesa';
+        showReminderAlert(reminder,info);
+        const title=`Lembrete: ${name}`;
+        const body=reminder.message||`${name} está programada para agora.`;
+        if('Notification' in window&&Notification.permission==='granted'){
+          try{const notification=new Notification(title,{body,tag:`despesa-${reminder.categoryId}`,renotify:true,requireInteraction:true,vibrate:[300,120,300]});notification.onclick=()=>{window.focus();notification.close()}}catch(error){}
+        }
+        toast(`${title}: ${body}`);
+      }
+      function checkReminders(){
+        const now=Date.now();let changed=false;
+        reminders.forEach(reminder=>{
+          const when=new Date(reminder.when).getTime();
+          if(!reminder.fired&&Number.isFinite(when)&&when<=now){
+            if(!reminder.pushMessageId)showReminderNotification(reminder);
+            if(reminder.repeat&&reminder.repeat!=='once'){
+              reminder.monthDay=reminder.monthDay||new Date(reminder.when).getDate();
+              let nextWhen=nextReminderWhen(reminder.when,reminder.repeat,reminder.monthDay),nextTime=new Date(nextWhen).getTime();
+              while(Number.isFinite(nextTime)&&nextTime<=now){nextWhen=nextReminderWhen(nextWhen,reminder.repeat,reminder.monthDay);nextTime=new Date(nextWhen).getTime()}
+              reminder.when=nextWhen;reminder.fired=false;reminder.lastFiredAt=new Date().toISOString();reminder.pushMessageId='';reminder.pushDueAt='';
+            }else{reminder.fired=true;reminder.firedAt=new Date().toISOString()}
+            changed=true;
+          }
+        });
+        if(changed){saveReminders();renderReminderList();void syncUnscheduledRemoteReminders()}
+      }
+ 
+      function newMonthFromCurrent(){
+        if(monthBook.active===baseCurrentKey)monthBook.months[baseCurrentKey]=JSON.parse(JSON.stringify(state));
+        const current=monthBook.months[baseCurrentKey];
+        const source=current&&Array.isArray(current.categories)?current.categories:initialCategories;
+        return {salary:0,categories:source.map(item=>({...item,amount:0,status:'pending'}))};
+      }
+ 
       function renderList(){
         if(sortCategories())save(false);
         const normalizeSearchText=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
         const nameQuery=normalizeSearchText($('searchExpenseName')?.dataset.applied).trim(),dueQuery=($('searchExpenseDue')?.dataset.applied||'').replace(/\D/g,'');
         const filteredCategories=state.categories.filter(item=>(!nameQuery||normalizeSearchText(item.name).includes(nameQuery))&&(!dueQuery||String(item.dueDay||'').includes(dueQuery)));
-        $('expenseList').innerHTML=filteredCategories.length?filteredCategories.map((item,index)=>{const dueOptions='<option value="">Selecione</option>'+Array.from({length:31},(_,day)=>`<option value="${day+1}" ${Number(item.dueDay)===day+1?'selected':''}>Dia ${day+1}</option>`).join('');return `<article class="expense-card" data-id="${escapeHtml(item.id)}">
-          <div class="expense-head"><div class="expense-name"><input class="category-name" value="${escapeHtml(item.name)}" maxlength="30" aria-label="Nome da despesa"></div><div class="amount-column"><div class="expense-amount"><span>R$</span><input class="amount-input" type="text" inputmode="decimal" value="${item.amount?formatInput(item.amount):''}" placeholder="0,00" aria-label="Valor de ${escapeHtml(item.name)}"></div><button type="button" class="clear-amount" aria-label="Limpar valor de ${escapeHtml(item.name)}">Limpar</button></div></div>
+        $('expenseList').innerHTML=filteredCategories.length?filteredCategories.map((item,index)=>{const reminderActive=reminders.some(reminder=>reminder.categoryId===item.id),dueOptions='<option value="">Selecione</option>'+Array.from({length:31},(_,day)=>`<option value="${day+1}" ${Number(item.dueDay)===day+1?'selected':''}>Dia ${day+1}</option>`).join('');return `<article class="expense-card" data-id="${escapeHtml(item.id)}">
+          <div class="expense-head"><div class="expense-name">${reminderActive?'<span class="reminder-indicator reminder-mini-clock" aria-label="Lembrete ativo" title="Lembrete ativo"><span class="clock-hand clock-hour-hand"></span><span class="clock-hand clock-minute-hand"></span><span class="clock-center-dot"></span></span>':''}<input class="category-name" value="${escapeHtml(item.name)}" maxlength="30" aria-label="Nome da despesa"></div><div class="amount-column"><div class="expense-amount"><span>R$</span><input class="amount-input" type="text" inputmode="decimal" value="${item.amount?formatInput(item.amount):''}" placeholder="0,00" aria-label="Valor de ${escapeHtml(item.name)}"></div><button type="button" class="clear-amount" aria-label="Limpar valor de ${escapeHtml(item.name)}">Limpar</button></div></div>
           <div class="details-row"><div><div class="due-line"><span class="field-label">Vencimento:</span></div><div class="due-control"><select class="due-input" aria-label="Dia de vencimento de ${escapeHtml(item.name)}">${dueOptions}</select></div></div><div class="status-field"><span class="field-label">Status da conta:</span><div class="status-buttons"><button type="button" class="status-btn paid ${item.status==='paid'?'active':''}" data-status="paid" aria-label="Marcar ${escapeHtml(item.name)} como paga">✓ Pago</button><button type="button" class="status-btn pending ${item.status==='pending'?'active':''}" data-status="pending" aria-label="Marcar ${escapeHtml(item.name)} como pendente">◷ A pagar</button></div></div></div>
-          <div class="due-footer"><button type="button" class="delete-expense" aria-label="Excluir esta despesa: ${escapeHtml(item.name)}">excluir despesa</button></div>
+          <div class="due-footer"><button type="button" class="create-reminder" data-category-id="${escapeHtml(item.id)}">adicionar lembrete</button><button type="button" class="delete-expense" aria-label="Excluir esta despesa: ${escapeHtml(item.name)}">excluir despesa</button></div>
         </article>`}).join(''):'<div class="no-results">Nenhuma despesa encontrada.</div>';
         document.querySelectorAll('.amount-input').forEach(input=>input.addEventListener('input',e=>{e.target.value=formatBRLTyping(e.target.value);const item=find(e.target);item.amount=parseBRL(e.target.value);save(false,false);renderTotals()}));
         document.querySelectorAll('.amount-input').forEach(input=>input.addEventListener('blur',e=>{const item=find(e.target);if(item.amount)e.target.value=formatInput(item.amount);save()}));
@@ -420,7 +818,7 @@
           if(dueOrderPending)commitDueDateOrder();else save();
         }));
         document.querySelectorAll('.status-btn').forEach(button=>button.addEventListener('click',e=>{const item=find(e.currentTarget);item.status=e.currentTarget.dataset.status;save();renderList();renderTotals()}));
-        document.querySelectorAll('.delete-expense').forEach(button=>button.addEventListener('click',e=>{const item=find(e.currentTarget);if(!confirm(`Excluir a despesa "${item.name}"?`))return;state.categories=state.categories.filter(x=>x.id!==item.id);save();renderList();renderTotals();toast('Despesa excluída.') }));
+        document.querySelectorAll('.delete-expense').forEach(button=>button.addEventListener('click',async e=>{const item=find(e.currentTarget);if(!confirm(`Excluir a despesa "${item.name}"?`))return;const removed=reminders.filter(reminder=>reminder.categoryId===item.id);removed.forEach(reminder=>{if(reminder.pushMessageId)void cancelRemoteReminder(reminder.pushMessageId)});reminders=reminders.filter(reminder=>reminder.categoryId!==item.id);saveReminders();state.categories=state.categories.filter(x=>x.id!==item.id);save();renderReminderList();renderList();renderTotals();toast('Despesa excluída.') }));document.querySelectorAll('.create-reminder').forEach(button=>button.addEventListener('click',e=>{renderReminderForm();$('reminderExpense').value=e.currentTarget.dataset.categoryId;updateReminderExpenseDisplay();renderReminderList();$('reminderModal').classList.add('open');setTimeout(()=>$('reminderDate').focus(),100)}));
       }
       function find(element){return state.categories.find(x=>x.id===element.closest('.expense-card').dataset.id)}
       function placeCaretAtTouch(input,clientX){
@@ -519,6 +917,49 @@
       $('openHistory').setAttribute('aria-controls','historyModal');$('openHistory').addEventListener('click',openHistory);$('scrollTopAction').addEventListener('click',()=>{document.querySelector('.app').scrollTo({top:0,behavior:'smooth'})});
       $('openAnnualSummary').setAttribute('aria-controls','annualSummaryModal');$('openAnnualSummary').addEventListener('click',openAnnualSummary);$('closeAnnualSummary').addEventListener('click',closeAnnualSummary);$('annualSummaryModal').addEventListener('click',event=>{if(event.target===$('annualSummaryModal'))closeAnnualSummary()});$('annualSummaryYear').addEventListener('change',renderAnnualSummary);
       
+      $('reminderHour').addEventListener('change',syncReminderClock);$('reminderMinute').addEventListener('change',syncReminderClock);
+      const closeReminder=()=>{$('reminderModal').classList.remove('open');$('reminderForm').reset()};
+      $('closeReminder').addEventListener('click',closeReminder);$('reminderModal').addEventListener('click',e=>{if(e.target===$('reminderModal'))closeReminder()});$('reminderOffset').addEventListener('change',applyReminderOffset);
+      let reminderSaveInProgress=false;
+      $('reminderForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const saveButton=$('saveReminderButton');
+        if(reminderSaveInProgress)return;
+        if(reminders.length>=REMINDER_LIMIT){toast('Limite de 50 lembretes atingido. Exclua um antes de cadastrar outro.');return}
+        syncReminderClock();
+        const categoryId=$('reminderExpense').value,date=$('reminderDate').value,time=$('reminderTime').value||`${$('reminderHour').value}:${$('reminderMinute').value}`,repeat=$('reminderRepeat').value||'once',when=new Date(`${date}T${time}:00`),categoryIndex=state.categories.findIndex(item=>item.id===categoryId);
+        if(categoryIndex<0){toast('Selecione uma despesa válida.');return}
+        if(Number.isNaN(when.getTime())||when.getTime()<=Date.now()){toast('Escolha uma data e horário futuros.');return}
+        const reminder={id:`reminder-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,categoryId,when:when.toISOString(),repeat,monthDay:repeat==='monthly'?when.getDate():null,message:'',fired:false,pushMessageId:'',pushDueAt:'',createdAt:new Date().toISOString()};
+        const savedCategoryId=categoryId,hasFutureDue=when.getTime()>Date.now();
+        if(hasFutureDue)activeReminderPushSchedules.add(reminder.id);
+        const pushSubscriptionPromise=hasFutureDue?requestReminderPushSubscriptionId():Promise.resolve('');
+        reminderSaveInProgress=true;if(saveButton)saveButton.disabled=true;
+        reminders.push(reminder);
+        try{saveReminders()}catch(error){reminders.pop();activeReminderPushSchedules.delete(reminder.id);reminderSaveInProgress=false;if(saveButton)saveButton.disabled=false;toast('Não foi possível salvar o lembrete. Confira o armazenamento do navegador e tente novamente.');return}
+        renderReminderList();renderList();
+        $('reminderForm').reset();renderReminderForm();$('reminderExpense').value=savedCategoryId;updateReminderExpenseDisplay();
+        reminderSaveInProgress=false;if(saveButton)saveButton.disabled=false;
+        toast(`Lembrete salvo (${reminders.length}/${REMINDER_LIMIT}).`);
+        if(hasFutureDue){
+          void (async()=>{
+            try{
+              const subscriptionId=await pushSubscriptionPromise;
+              if(!subscriptionId){toast('Lembrete salvo, mas não foi possível ativar o aviso com o app fechado. Permita as notificações do Despesas Recorrentes.');return}
+              const result=await scheduleRemoteReminder(reminder,subscriptionId);
+              const latest=readStoredJSON(REMINDERS_KEY,[]),saved=Array.isArray(latest)?latest.find(item=>item.id===reminder.id):null;
+              if(result.scheduled&&saved&&!saved.fired){
+                saved.pushMessageId=result.messageId;saved.pushDueAt=result.dueAt;
+                reminders=latest;saveReminders();renderReminderList();renderList();
+                toast('Aviso ativado para o horário escolhido.');
+              }else if(result.scheduled){void cancelRemoteReminder(result.messageId)}
+              else toast('Lembrete salvo, mas o aviso com o app fechado não pôde ser agendado. Confira a conexão e as permissões.');
+            }catch(_){toast('Lembrete salvo, mas o aviso com o app fechado não pôde ser ativado. Confira as permissões.')}finally{
+              activeReminderPushSchedules.delete(reminder.id);void syncUnscheduledRemoteReminders();
+            }
+          })();
+        }
+      });
       const activateHistoryClose=event=>{event.preventDefault();event.stopPropagation();closeHistory()};$('closeHistory').addEventListener('click',activateHistoryClose);$('clearHistory').addEventListener('click',()=>{const monthEntries=entries.filter(item=>entryMonthKey(item)===monthBook.active);if(!monthEntries.length){toast('O arquivo deste mês já está vazio.');return}if(!confirm(`Limpar o histórico de entradas de ${monthText(monthBook.active)}? Os valores já somados ao orçamento permanecerão nos campos financeiros.`))return;const monthEntryIds=new Set(monthEntries.map(item=>item.id));entries=entries.filter(item=>!monthEntryIds.has(item.id));save();renderEntryHistory();toast('Arquivo do mês limpo.')});$('historyModal').addEventListener('click',e=>{if(e.target===$('historyModal'))closeHistory()});
       $('entryForm').addEventListener('submit',e=>{e.preventDefault();const value=parseBRL($('newEntryValue').value);const title=$('newEntryTitle').value.trim()||'Sem título';if(!(value>0)){toast('Informe um valor válido.');$('newEntryValue').focus();return}applyDeposit(value,title);closeEntry();toast('Nova entrada adicionada ao orçamento.')});
       function switchMonth(key){if(!monthBook.months[key])return;if(monthBook.active!==key)monthBook.months[monthBook.active]=state;monthBook.active=key;state=monthBook.months[key];calendarYear=Number(key.slice(0,4));save();updateMonthHeader();$('salary').value=state.salary?formatInput(state.salary):'0,00';renderList();renderTotals();renderCalendar();if($('historyModal')?.classList.contains('open'))renderEntryHistory()}
@@ -572,7 +1013,9 @@
       }
       $('undoAction').addEventListener('click',undoLastAction);$('redoAction').addEventListener('click',redoLastAction);$('scrollBottomAction').addEventListener('click',()=>{const scrollContainer=document.querySelector('.app');scrollContainer.scrollTo({top:scrollContainer.scrollHeight,behavior:'smooth'})});
       
-      document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCategory();closeEntry();closeHistory();closeAnnualSummary();closeSettings?.()}});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCategory();closeEntry();closeHistory();closeAnnualSummary();closeReminder();closeSettings?.()}});
+      document.addEventListener('visibilitychange',checkReminders);
+      window.setInterval(checkReminders,15000);
       const footerApp=document.querySelector('.app'),footerBrand=document.querySelector('.top');if(footerApp&&footerBrand){footerBrand.classList.add('footer-brand');footerApp.appendChild(footerBrand)}
       $('brandHomeButton')?.addEventListener('click',()=>{const cover=document.getElementById('coverScreen');if(cover){cover.classList.remove('is-hidden');document.body.classList.add('cover-open')}window.scrollTo(0,0);document.querySelector('.app')?.scrollTo({top:0,behavior:'smooth'})});
       const settingsModal=$('settingsModal'),appTheme=$('appTheme'),savedTheme=localStorage.getItem('appTheme')||'light';
@@ -582,14 +1025,17 @@
       $('closeSettings')?.addEventListener('click',closeSettings);$('cancelSettings')?.addEventListener('click',closeSettings);settingsModal?.addEventListener('click',e=>{if(e.target===settingsModal)closeSettings()});
       $('saveSettings')?.addEventListener('click',()=>{const value=appTheme?.value||'light';localStorage.setItem('appTheme',value);document.body.classList.toggle('dark-theme',value==='dark');document.body.classList.toggle('high-contrast',value==='contrast');closeSettings();toast('Configurações salvas com sucesso.')});
       document.querySelectorAll('[data-settings-target]').forEach(button=>button.addEventListener('click',()=>{const panel=$(button.dataset.settingsTarget);if(panel)panel.classList.toggle('open')}));
-      $('newSaveSettings')?.addEventListener('click',()=>{if(newAppTheme)applyNewTheme(newAppTheme.value);toast('Configurações salvas com sucesso.')});
+      $('newTestAlertSound')?.addEventListener('click',()=>{primeReminderAudio();playReminderSound(newAlertSound?.value||localStorage.getItem('alertSound')||'double',newAlertVolume?.value||localStorage.getItem('alertVolume')||100);toast('Som de alerta reproduzido.')});
+      $('newSaveSettings')?.addEventListener('click',()=>{if(newAppTheme)applyNewTheme(newAppTheme.value);if(newAlertSound)localStorage.setItem('alertSound',newAlertSound.value);if(newAlertVolume)localStorage.setItem('alertVolume',newAlertVolume.value);toast('Configurações salvas com sucesso.')});
       $('newCancelSettings')?.addEventListener('click',()=>closeSettings());
       const importantScreen=$('importantScreen');$('newImportantButton')?.addEventListener('click',()=>{importantScreen?.classList.add('open');closeSettings()});$('closeImportantScreen')?.addEventListener('click',()=>importantScreen?.classList.remove('open'));importantScreen?.addEventListener('click',event=>{if(event.target===importantScreen)importantScreen.classList.remove('open')});
-      const newAppTheme=$('newAppTheme');
+      const newAppTheme=$('newAppTheme'),newAlertSound=$('newAlertSound'),newAlertVolume=$('newAlertVolume'),newAlertVolumeValue=$('newAlertVolumeValue');
       const applyNewTheme=value=>{localStorage.setItem('appTheme',value);document.body.classList.toggle('dark-theme',value==='dark');document.body.classList.toggle('high-contrast',value==='contrast')};
       if(newAppTheme){newAppTheme.value=localStorage.getItem('appTheme')||'light';newAppTheme.addEventListener('change',()=>applyNewTheme(newAppTheme.value))}
+      if(newAlertSound){newAlertSound.value=localStorage.getItem('alertSound')||'double';newAlertSound.addEventListener('change',()=>localStorage.setItem('alertSound',newAlertSound.value))}
+      if(newAlertVolume){newAlertVolume.value=localStorage.getItem('alertVolume')||'100';if(newAlertVolumeValue)newAlertVolumeValue.textContent=`${newAlertVolume.value}%`;newAlertVolume.addEventListener('input',()=>{localStorage.setItem('alertVolume',newAlertVolume.value);if(newAlertVolumeValue)newAlertVolumeValue.textContent=`${newAlertVolume.value}%`})}
       updateUndoButton();updateMonthHeader();$('salary').value=state.salary?formatInput(state.salary):'0,00';
-      renderList();renderTotals();renderCalendar();
+      renderList();renderTotals();renderCalendar();checkReminders();
     })();
   </script>
  
