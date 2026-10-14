@@ -398,6 +398,27 @@
           return subscription?.optedIn&&subscription?.id?subscription.id:'';
         },timeoutMs))||'';
       }
+      function waitForOneSignalSubscriptionId(OneSignal,timeoutMs=30000){
+        const initial=OneSignal?.User?.PushSubscription;
+        if(initial?.optedIn&&initial?.id)return Promise.resolve(initial.id);
+        return new Promise(resolve=>{
+          let finished=false,interval=null;
+          const finish=id=>{
+            if(finished)return;
+            finished=true;clearTimeout(timer);if(interval)clearInterval(interval);
+            try{OneSignal?.User?.PushSubscription?.removeEventListener?.('change',check)}catch(_){}
+            resolve(id||'');
+          };
+          const check=()=>{
+            const current=OneSignal?.User?.PushSubscription;
+            if(current?.optedIn&&current?.id)finish(current.id);
+          };
+          const timer=setTimeout(()=>finish(''),timeoutMs);
+          try{initial?.addEventListener?.('change',check)}catch(_){}
+          interval=setInterval(check,250);
+          check();
+        });
+      }
       function requestReminderPushSubscriptionId(){
         return withOneSignal(async OneSignal=>{
           let subscription=OneSignal?.User?.PushSubscription;
@@ -408,13 +429,7 @@
           if(!permissionGranted)return '';
           subscription=OneSignal?.User?.PushSubscription;
           if(subscription?.optIn)await subscription.optIn();
-          const deadline=Date.now()+15000;
-          while(Date.now()<deadline){
-            subscription=OneSignal?.User?.PushSubscription;
-            if(subscription?.optedIn&&subscription?.id)return subscription.id;
-            await new Promise(resolve=>setTimeout(resolve,250));
-          }
-          return '';
+          return await waitForOneSignalSubscriptionId(OneSignal,30000);
         },45000);
       }
       async function remotePushRequest(path,payload){
@@ -968,7 +983,11 @@
           void (async()=>{
             try{
               const subscriptionId=await pushSubscriptionPromise;
-              if(!subscriptionId){toast('Lembrete salvo, mas não foi possível ativar o aviso com o app fechado. Permita as notificações do Despesas Recorrentes.');return}
+              if(!subscriptionId){
+                const permission='Notification' in window?Notification.permission:'unavailable';
+                toast(permission==='granted'?'O Chrome permite notificações, mas o OneSignal não registrou este aparelho.':'Lembrete salvo, mas a permissão de notificações não está concedida neste navegador.');
+                return;
+              }
               const result=await scheduleRemoteReminder(reminder,subscriptionId);
               const latest=readStoredJSON(REMINDERS_KEY,[]),saved=Array.isArray(latest)?latest.find(item=>item.id===reminder.id):null;
               if(result.scheduled&&saved&&!saved.fired){
