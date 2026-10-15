@@ -771,6 +771,15 @@
       }
       function renderReminderList(){
         const list=$('reminderList');if(!list)return;
+        const now=Date.now(),expiredOneTime=reminders.filter(reminder=>{
+          const due=new Date(reminder.when).getTime();
+          return !['daily','weekly','monthly'].includes(reminder.repeat)&&(Boolean(reminder.fired)||(Number.isFinite(due)&&due<=now));
+        });
+        if(expiredOneTime.length){
+          const expiredIds=new Set(expiredOneTime.map(reminder=>reminder.id));
+          expiredOneTime.forEach(reminder=>{if(reminder.pushMessageId)void cancelRemoteReminder(reminder.pushMessageId)});
+          reminders=reminders.filter(reminder=>!expiredIds.has(reminder.id));saveReminders();renderList();
+        }
         const count=$('reminderCount');if(count)count.textContent=`${reminders.length}/${REMINDER_LIMIT}`;
         const sorted=[...reminders].sort((a,b)=>new Date(a.when)-new Date(b.when));
         list.innerHTML=sorted.length?sorted.map(reminder=>{
