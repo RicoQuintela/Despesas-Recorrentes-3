@@ -821,21 +821,24 @@
         toast(`${title}: ${body}`);
       }
       function checkReminders(){
-        const now=Date.now();let changed=false;
+        const now=Date.now();let changed=false;const expiredOneTimeIds=new Set();
         reminders.forEach(reminder=>{
-          const when=new Date(reminder.when).getTime();
-          if(!reminder.fired&&Number.isFinite(when)&&when<=now){
+          const when=new Date(reminder.when).getTime(),recurring=['daily','weekly','monthly'].includes(reminder.repeat);
+          if(!recurring&&Number.isFinite(when)&&when<=now){
+            if(!reminder.fired&&!reminder.pushMessageId)showReminderNotification(reminder);
+            if(reminder.pushMessageId)void cancelRemoteReminder(reminder.pushMessageId);
+            expiredOneTimeIds.add(reminder.id);changed=true;return;
+          }
+          if(!reminder.fired&&recurring&&Number.isFinite(when)&&when<=now){
             if(!reminder.pushMessageId)showReminderNotification(reminder);
-            if(reminder.repeat&&reminder.repeat!=='once'){
-              reminder.monthDay=reminder.monthDay||new Date(reminder.when).getDate();
-              let nextWhen=nextReminderWhen(reminder.when,reminder.repeat,reminder.monthDay),nextTime=new Date(nextWhen).getTime();
-              while(Number.isFinite(nextTime)&&nextTime<=now){nextWhen=nextReminderWhen(nextWhen,reminder.repeat,reminder.monthDay);nextTime=new Date(nextWhen).getTime()}
-              reminder.when=nextWhen;reminder.fired=false;reminder.lastFiredAt=new Date().toISOString();reminder.pushMessageId='';reminder.pushDueAt='';
-            }else{reminder.fired=true;reminder.firedAt=new Date().toISOString()}
-            changed=true;
+            reminder.monthDay=reminder.monthDay||new Date(reminder.when).getDate();
+            let nextWhen=nextReminderWhen(reminder.when,reminder.repeat,reminder.monthDay),nextTime=new Date(nextWhen).getTime();
+            while(Number.isFinite(nextTime)&&nextTime<=now){nextWhen=nextReminderWhen(nextWhen,reminder.repeat,reminder.monthDay);nextTime=new Date(nextWhen).getTime()}
+            reminder.when=nextWhen;reminder.fired=false;reminder.lastFiredAt=new Date().toISOString();reminder.pushMessageId='';reminder.pushDueAt='';changed=true;
           }
         });
-        if(changed){saveReminders();renderReminderList();void syncUnscheduledRemoteReminders()}
+        if(expiredOneTimeIds.size)reminders=reminders.filter(reminder=>!expiredOneTimeIds.has(reminder.id));
+        if(changed){saveReminders();renderReminderList();renderList();void syncUnscheduledRemoteReminders()}
       }
  
       function newMonthFromCurrent(){
