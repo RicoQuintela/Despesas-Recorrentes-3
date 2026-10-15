@@ -316,21 +316,6 @@
         
         <button class="settings-response-button important" id="newImportantButton" type="button" onclick="document.getElementById('importantScreen').classList.add('open');document.getElementById('settingsModal').classList.remove('open')">O botão mais importante do app</button>
       </div>
-      <div class="settings-response-box backup-section" aria-label="Cópia de segurança dos dados">
-        <strong>Backup dos seus dados</strong>
-        <p>Inclui despesas, meses, entradas e lembretes. Para salvar sem baixar arquivo, escolha Samsung Notes ou Drive no compartilhamento. Os avisos push poderão precisar ser ativados novamente.</p>
-        <button class="settings-response-button save" id="downloadBackupButton" type="button">Baixar backup</button>
-        <button class="settings-response-button" id="shareBackupTextButton" type="button">Compartilhar backup</button>
-        <button class="settings-response-button" id="copyBackupTextButton" type="button">Copiar backup em texto</button>
-        <label id="backupTextOutputLabel" for="backupTextOutput" hidden>Texto do backup — copie e guarde em Notas:</label>
-        <textarea id="backupTextOutput" rows="6" readonly hidden style="width:100%;box-sizing:border-box;font:12px monospace;white-space:pre;overflow:auto"></textarea>
-        <button class="settings-response-button cancel" id="restoreBackupButton" type="button">Restaurar de arquivo</button>
-        <button class="settings-response-button" id="showPasteBackupButton" type="button">Restaurar backup colado</button>
-        <label id="backupTextInputLabel" for="backupTextInput" hidden>Cole aqui o texto do backup:</label>
-        <textarea id="backupTextInput" rows="6" hidden style="width:100%;box-sizing:border-box;font:12px monospace;white-space:pre;overflow:auto"></textarea>
-        <button class="settings-response-button save" id="restoreBackupTextButton" type="button" hidden>Restaurar texto colado</button>
-        <input id="backupFileInput" type="file" accept=".json,application/json" hidden>
-      </div>
     </section>
   </div>
   <div aria-modal="true" class="modal-backdrop important-screen" id="importantScreen" role="dialog">
@@ -353,10 +338,6 @@
       const KEY='meus-gastos-lista-v3', OLD_KEY='meus-gastos-lista-v2', MONTHS_KEY='meus-gastos-meses-v1', UNDO_KEY='meus-gastos-desfazer-v1', REDO_KEY='meus-gastos-refazer-v1', CALENDAR_DIMENSIONS_KEY='meus-gastos-calendario-dimensoes-v5', REMINDERS_KEY='meus-gastos-lembretes-v1';
       const MIN_CALENDAR_YEAR=2026, MAX_CALENDAR_YEAR=2050;
       const ENTRIES_KEY='meus-gastos-entradas-v1';
-      const BACKUP_FORMAT='despesas-recorrentes-backup';
-      const BACKUP_VERSION=1;
-      const BACKUP_KEYS=[KEY,OLD_KEY,MONTHS_KEY,UNDO_KEY,REDO_KEY,CALENDAR_DIMENSIONS_KEY,REMINDERS_KEY,ENTRIES_KEY,'appTheme','alertSound','alertVolume'];
-      const BACKUP_JSON_KEYS=new Set([KEY,OLD_KEY,MONTHS_KEY,UNDO_KEY,REDO_KEY,CALENDAR_DIMENSIONS_KEY,REMINDERS_KEY,ENTRIES_KEY]);
       const initialCategories=[
         {id:'luz',name:'Luz',icon:'💡',hint:'Conta de energia',amount:0,status:'pending',dueDay:10},
         {id:'agua',name:'Água',icon:'💧',hint:'Conta de água',amount:0,status:'pending',dueDay:12},
@@ -1092,76 +1073,6 @@
       document.querySelectorAll('[data-settings-target]').forEach(button=>button.addEventListener('click',()=>{const panel=$(button.dataset.settingsTarget);if(panel)panel.classList.toggle('open')}));
       $('newTestAlertSound')?.addEventListener('click',()=>{primeReminderAudio();playReminderSound(newAlertSound?.value||localStorage.getItem('alertSound')||'double',newAlertVolume?.value||localStorage.getItem('alertVolume')||100);toast('Som de alerta reproduzido.')});
       $('newSaveSettings')?.addEventListener('click',()=>{if(newAppTheme)applyNewTheme(newAppTheme.value);if(newAlertSound)localStorage.setItem('alertSound',newAlertSound.value);if(newAlertVolume)localStorage.setItem('alertVolume',newAlertVolume.value);toast('Configurações salvas com sucesso.')});
-      const downloadBackupButton=$('downloadBackupButton'),shareBackupTextButton=$('shareBackupTextButton'),copyBackupTextButton=$('copyBackupTextButton'),backupTextOutput=$('backupTextOutput'),backupTextOutputLabel=$('backupTextOutputLabel'),restoreBackupButton=$('restoreBackupButton'),backupFileInput=$('backupFileInput'),showPasteBackupButton=$('showPasteBackupButton'),backupTextInput=$('backupTextInput'),backupTextInputLabel=$('backupTextInputLabel'),restoreBackupTextButton=$('restoreBackupTextButton');
-      const createBackupText=()=>{
-        const data={};
-        BACKUP_KEYS.forEach(key=>{
-          let raw=localStorage.getItem(key);
-          if(key===REMINDERS_KEY&&raw!==null){try{const list=JSON.parse(raw);if(Array.isArray(list))raw=JSON.stringify(list.map(item=>item&&typeof item==='object'?{...item,pushMessageId:'',pushDueAt:''}:item))}catch(_){}}
-          data[key]=raw;
-        });
-        return JSON.stringify({format:BACKUP_FORMAT,version:BACKUP_VERSION,createdAt:new Date().toISOString(),data},null,2);
-      };
-      const applyBackupText=text=>{
-        if(typeof text!=='string'||!text.trim()||text.length>8*1024*1024)throw new Error('invalid_backup_size');
-        const backup=JSON.parse(text),data=backup?.data;
-        if(backup?.format!==BACKUP_FORMAT||backup?.version!==BACKUP_VERSION||!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_backup');
-        const providedKeys=Object.keys(data);
-        if(!providedKeys.length||providedKeys.some(key=>!BACKUP_KEYS.includes(key)))throw new Error('invalid_keys');
-        const prepared={};
-        for(const key of BACKUP_KEYS){
-          let raw=data[key];
-          if(raw===null||raw===undefined){prepared[key]=null;continue}
-          if(typeof raw!=='string')throw new Error('invalid_value');
-          if(BACKUP_JSON_KEYS.has(key)){
-            const value=JSON.parse(raw);
-            if((key===REMINDERS_KEY||key===ENTRIES_KEY)&&!Array.isArray(value))throw new Error('invalid_list');
-            if(key===REMINDERS_KEY)raw=JSON.stringify(value.map(item=>item&&typeof item==='object'?{...item,pushMessageId:'',pushDueAt:''}:item));
-          }
-          prepared[key]=raw;
-        }
-        if(!confirm('Restaurar esse backup vai substituir os dados atuais deste app. Quer continuar?'))return false;
-        const previous={};BACKUP_KEYS.forEach(key=>previous[key]=localStorage.getItem(key));
-        try{BACKUP_KEYS.forEach(key=>{prepared[key]===null?localStorage.removeItem(key):localStorage.setItem(key,prepared[key])})}
-        catch(error){BACKUP_KEYS.forEach(key=>{try{previous[key]===null?localStorage.removeItem(key):localStorage.setItem(key,previous[key])}catch(_){}});throw error}
-        return true;
-      };
-      const finishBackupRestore=()=>{closeSettings();toast('Backup restaurado. Reabrindo o app...');setTimeout(()=>location.reload(),600)};
-      downloadBackupButton?.addEventListener('click',()=>{
-        try{
-          const blob=new Blob([createBackupText()],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
-          link.href=url;link.download=`despesas-recorrentes-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
-          toast('Se o arquivo não aparecer em Downloads, use Copiar backup em texto.');
-        }catch(_){toast('Não foi possível criar o backup. Use Copiar backup em texto.')}
-      });
-      shareBackupTextButton?.addEventListener('click',async()=>{
-        try{
-          if(typeof navigator.share!=='function'){toast('Compartilhamento não disponível aqui. Use Copiar backup em texto.');return}
-          await navigator.share({title:'Backup do Despesas Recorrentes',text:createBackupText()});
-        }catch(error){if(error?.name!=='AbortError')toast('Não consegui abrir o compartilhamento. Tente Copiar backup em texto.')}
-      });
-      copyBackupTextButton?.addEventListener('click',async()=>{
-        try{
-          const text=createBackupText();backupTextOutput.value=text;backupTextOutput.hidden=false;backupTextOutputLabel.hidden=false;
-          let copied=false;
-          try{if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){await navigator.clipboard.writeText(text);copied=true}}catch(_){}
-          if(!copied){try{backupTextOutput.focus();backupTextOutput.select();backupTextOutput.setSelectionRange(0,backupTextOutput.value.length);copied=document.execCommand('copy')}catch(_){}}
-          if(copied)toast('Backup copiado. Cole em Samsung Notes e salve.');
-          else{backupTextOutput.focus();backupTextOutput.select();toast('A cópia automática foi bloqueada. Tente Compartilhar backup.')}
-        }catch(_){toast('Não foi possível gerar o texto do backup. Seus dados continuam no app.')}
-      });
-      restoreBackupButton?.addEventListener('click',()=>backupFileInput?.click());
-      backupFileInput?.addEventListener('change',async event=>{
-        const file=event.target.files?.[0];if(!file)return;
-        try{if(file.size>8*1024*1024)throw new Error('file_too_large');if(applyBackupText(await file.text()))finishBackupRestore()}
-        catch(_){toast('Arquivo de backup inválido ou incompatível. Os dados atuais foram mantidos.')}
-        finally{backupFileInput.value=''}
-      });
-      showPasteBackupButton?.addEventListener('click',()=>{backupTextInput.hidden=false;backupTextInputLabel.hidden=false;restoreBackupTextButton.hidden=false;backupTextInput.focus()});
-      restoreBackupTextButton?.addEventListener('click',()=>{
-        try{if(applyBackupText(backupTextInput.value))finishBackupRestore()}
-        catch(_){toast('Texto inválido. Cole o backup completo sem alterar o conteúdo.')}
-      });
       $('newCancelSettings')?.addEventListener('click',()=>closeSettings());
       const importantScreen=$('importantScreen');$('newImportantButton')?.addEventListener('click',()=>{importantScreen?.classList.add('open');closeSettings()});$('closeImportantScreen')?.addEventListener('click',()=>importantScreen?.classList.remove('open'));importantScreen?.addEventListener('click',event=>{if(event.target===importantScreen)importantScreen.classList.remove('open')});
       const newAppTheme=$('newAppTheme'),newAlertSound=$('newAlertSound'),newAlertVolume=$('newAlertVolume'),newAlertVolumeValue=$('newAlertVolumeValue');
