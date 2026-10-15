@@ -359,16 +359,24 @@
       const REMINDER_LIMIT=50;
       let reminders=readStoredJSON(REMINDERS_KEY,[]);
       if(!Array.isArray(reminders))reminders=[];
+      const legacyReminderMessageIdsToCancel=[];
       let removedLegacyReminderCodes=false;
       reminders.forEach(reminder=>{if(reminder&&typeof reminder==='object'&&Object.prototype.hasOwnProperty.call(reminder,'code')){delete reminder.code;removedLegacyReminderCodes=true}});
       if(removedLegacyReminderCodes)localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));
       const saveReminders=()=>localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));
+      let normalizedLegacyReminderTypes=false;
+      reminders.forEach(reminder=>{
+        if(!reminder||typeof reminder!=='object'||['once','daily','weekly','monthly'].includes(reminder.repeat))return;
+        if(reminder.pushMessageId)legacyReminderMessageIdsToCancel.push(reminder.pushMessageId);
+        reminder.repeat='once';reminder.pushMessageId='';reminder.pushDueAt='';normalizedLegacyReminderTypes=true;
+      });
+      if(normalizedLegacyReminderTypes)saveReminders();
       let viewedSingleReminderRemoved=false;
       const viewedReminderParams=new URLSearchParams(window.location.search);
       const viewedReminderId=viewedReminderParams.get('viewReminderId');
       if(viewedReminderId){
         const viewedReminder=reminders.find(item=>item.id===viewedReminderId);
-        if(viewedReminder?.repeat==='once'){
+        if(viewedReminder&&!['daily','weekly','monthly'].includes(viewedReminder.repeat)){
           reminders=reminders.filter(item=>item.id!==viewedReminderId);
           saveReminders();
           viewedSingleReminderRemoved=true;
@@ -448,6 +456,7 @@
         if(!messageId)return true;
         try{const result=await remotePushRequest('cancel',{messageId});return Boolean(result.ok&&result.cancelled)}catch(_){return false}
       }
+      const legacyReminderCancellationPromise=Promise.all(legacyReminderMessageIdsToCancel.map(messageId=>cancelRemoteReminder(messageId)));
       async function scheduleRemoteReminder(reminder,subscriptionId,previousMessageId=''){
         const due=new Date(reminder.when),info=reminderInfo(reminder),expenseName=info.item?.name||'Despesa';
         if(Number.isNaN(due.getTime())||due.getTime()<=Date.now()||reminder.fired||!subscriptionId){
@@ -463,6 +472,7 @@
         if(reminderPushSyncInProgress)return;
         reminderPushSyncInProgress=true;
         try{
+          await legacyReminderCancellationPromise;
           const subscriptionId=await currentOneSignalSubscriptionId();
           if(!subscriptionId)return;
           let changed=false;
@@ -774,14 +784,20 @@
         }));
       }
       function removeOneTimeReminderAfterView(reminderId){
+        const latest=readStoredJSON(REMINDERS_KEY,reminders);
+        if(Array.isArray(latest))reminders=latest;
         const target=reminders.find(item=>item.id===reminderId);
-        if(!target||target.repeat!=='once')return false;
+        if(!target||['daily','weekly','monthly'].includes(target.repeat))return false;
         reminders=reminders.filter(item=>item.id!==reminderId);
         saveReminders();
         renderReminderList();renderList();
         toast('Lembrete único excluído após a visualização.');
         return true;
       }
+      window.addEventListener('storage',event=>{
+        if(event.key!==REMINDERS_KEY)return;
+        try{const latest=event.newValue?JSON.parse(event.newValue):[];if(Array.isArray(latest)){reminders=latest;renderReminderList();renderList()}}catch(_){ }
+      });
       let reminderAlertTimer=null;
       function showReminderAlert(reminder,info){
         const alert=$('reminderAlert'),name=$('reminderAlertName'),due=$('reminderAlertDue'),item=info.item;
@@ -790,6 +806,7 @@
         due.textContent=item?.dueDay?`Vencimento: dia ${item.dueDay}`:'Vencimento não informado';
         alert.classList.add('open');
         clearTimeout(reminderAlertTimer);
+        alert.onclick=()=>{clearTimeout(reminderAlertTimer);alert.classList.remove('open');removeOneTimeReminderAfterView(reminder.id)};
         reminderAlertTimer=setTimeout(()=>alert.classList.remove('open'),7000);
       }
       function showReminderNotification(reminder){
