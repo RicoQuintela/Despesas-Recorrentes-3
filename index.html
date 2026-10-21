@@ -466,7 +466,10 @@
         try{
           const response=await fetch(`${remotePushEndpoint}/${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
           const result=await response.json().catch(()=>({}));
-          if(!response.ok||!result.ok)throw new Error('remote-push-failed');
+          if(!response.ok||!result.ok){
+            const code=String(result.error||result.message||'worker_rejected').replace(/[^a-zA-Z0-9:_ -]/g,'').slice(0,60)||'worker_rejected';
+            const error=new Error(code);error.status=response.status;throw error;
+          }
           return result;
         }finally{clearTimeout(timeout)}
       }
@@ -479,12 +482,17 @@
         const due=new Date(reminder.when),info=reminderInfo(reminder),expenseName=info.item?.name||'Despesa';
         if(Number.isNaN(due.getTime())||due.getTime()<=Date.now()||reminder.fired||!subscriptionId){
           if(previousMessageId)await cancelRemoteReminder(previousMessageId);
-          return {scheduled:false};
+          const reason=Number.isNaN(due.getTime())?'invalid_due':due.getTime()<=Date.now()?'due_time_not_future':reminder.fired?'already_fired':'no_subscription_id';
+          return {scheduled:false,reason};
         }
         try{
           const result=await remotePushRequest('schedule',{subscriptionId,reminderId:reminder.id,repeat:reminder.repeat,dueAt:due.toISOString(),previousMessageId,project:remotePushProject,expenseName});
           return {scheduled:true,messageId:result.id,dueAt:due.toISOString()};
-        }catch(_){if(previousMessageId)await cancelRemoteReminder(previousMessageId);return {scheduled:false}}
+        }catch(error){
+          if(previousMessageId)await cancelRemoteReminder(previousMessageId);
+          const reason=error?.name==='AbortError'?'timeout':error?.status?`HTTP ${error.status} ${error.message}`:'network_error';
+          return {scheduled:false,reason:String(reason).slice(0,90)}
+        }
       }
       async function syncUnscheduledRemoteReminders(){
         if(reminderPushSyncInProgress)return;
@@ -1057,7 +1065,7 @@
                 reminders=latest;saveReminders();renderReminderList();renderList();
                 toast('Aviso ativado para o horário escolhido.');
               }else if(result.scheduled){void cancelRemoteReminder(result.messageId)}
-              else toast('Lembrete salvo, mas o aviso com o app fechado não pôde ser agendado. Confira a conexão e as permissões.');
+              else toast(isKodularNativeWebView?`Falha no agendamento: ${String(result.reason||'erro do Worker').slice(0,90)}`:'Lembrete salvo, mas o aviso com o app fechado não pôde ser agendado. Confira a conexão e as permissões.');
             }catch(_){toast('Lembrete salvo, mas o aviso com o app fechado não pôde ser ativado. Confira as permissões.')}finally{
               activeReminderPushSchedules.delete(reminder.id);void syncUnscheduledRemoteReminders();
             }
