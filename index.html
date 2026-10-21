@@ -156,14 +156,17 @@
   </style>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
+    window.__kodularNativePushBridge = !!(window.AppInventor && typeof window.AppInventor.getWebViewString === 'function');
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "e078e43d-0121-444a-a658-b780030a81f4",
-        serviceWorkerPath: "/Despesas-Recorrentes-3/sw.js",
-        serviceWorkerParam: { scope: "/Despesas-Recorrentes-3/" }
+    if (!window.__kodularNativePushBridge) {
+      window.OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "e078e43d-0121-444a-a658-b780030a81f4",
+          serviceWorkerPath: "/Despesas-Recorrentes-3/sw.js",
+          serviceWorkerParam: { scope: "/Despesas-Recorrentes-3/" }
+        });
       });
-    });
+    }
   </script>
   </head>
 <body class="cover-open">
@@ -385,6 +388,24 @@
       const remotePushUrl='https://ricoquintela.github.io/Despesas-Recorrentes-3/';
       const activeReminderPushSchedules=new Set();
       let reminderPushSyncInProgress=false;
+      function nativeOneSignalSubscriptionId(){
+        if(!window.__kodularNativePushBridge)return null;
+        try{return String(window.AppInventor.getWebViewString()||'').trim()}catch(_){return ''}
+      }
+      const isKodularNativeWebView=Boolean(window.__kodularNativePushBridge);
+      function waitForNativeOneSignalSubscriptionId(timeoutMs=12000){
+        if(!isKodularNativeWebView)return Promise.resolve('');
+        const immediate=nativeOneSignalSubscriptionId();
+        if(immediate)return Promise.resolve(immediate);
+        return new Promise(resolve=>{
+          let finished=false;
+          const finish=id=>{if(finished)return;finished=true;clearTimeout(timer);clearInterval(interval);resolve(id||'')};
+          const check=()=>{const id=nativeOneSignalSubscriptionId();if(id)finish(id)};
+          const timer=setTimeout(()=>finish(''),timeoutMs);
+          const interval=setInterval(check,250);
+          check();
+        });
+      }
       function withOneSignal(callback,timeoutMs=10000){
         return new Promise(resolve=>{
           const deferred=window.OneSignalDeferred;
@@ -396,6 +417,7 @@
         });
       }
       async function currentOneSignalSubscriptionId(timeoutMs=10000){
+        if(isKodularNativeWebView)return nativeOneSignalSubscriptionId()||'';
         return (await withOneSignal(OneSignal=>{
           const subscription=OneSignal?.User?.PushSubscription;
           return subscription?.optedIn&&subscription?.id?subscription.id:'';
@@ -423,6 +445,7 @@
         });
       }
       function requestReminderPushSubscriptionId(permissionRequestPromise=Promise.resolve('')){
+        if(isKodularNativeWebView)return waitForNativeOneSignalSubscriptionId();
         return withOneSignal(async OneSignal=>{
           let subscription=OneSignal?.User?.PushSubscription;
           if(subscription?.optedIn&&subscription?.id)return subscription.id;
@@ -481,11 +504,22 @@
           if(changed){saveReminders();renderReminderList()}
         }finally{reminderPushSyncInProgress=false}
       }
-      window.OneSignalDeferred.push(async OneSignal=>{
-        const subscription=OneSignal?.User?.PushSubscription;
-        if(subscription?.addEventListener)subscription.addEventListener('change',()=>{void syncUnscheduledRemoteReminders()});
-        if(subscription?.optedIn&&subscription?.id)void syncUnscheduledRemoteReminders();
-      });
+      if(isKodularNativeWebView){
+        let lastNativeSubscriptionId='';
+        setInterval(()=>{
+          const subscriptionId=nativeOneSignalSubscriptionId();
+          if(subscriptionId&&subscriptionId!==lastNativeSubscriptionId){
+            lastNativeSubscriptionId=subscriptionId;
+            void syncUnscheduledRemoteReminders();
+          }
+        },500);
+      }else{
+        window.OneSignalDeferred.push(async OneSignal=>{
+          const subscription=OneSignal?.User?.PushSubscription;
+          if(subscription?.addEventListener)subscription.addEventListener('change',()=>{void syncUnscheduledRemoteReminders()});
+          if(subscription?.optedIn&&subscription?.id)void syncUnscheduledRemoteReminders();
+        });
+      }
       let reminderAudioContext=null;
       function primeReminderAudio(){
         const AudioContextClass=window.AudioContext||window.webkitAudioContext;
@@ -998,7 +1032,7 @@
         const reminder={id:`reminder-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,categoryId,when:when.toISOString(),repeat,monthDay:repeat==='monthly'?when.getDate():null,message:'',fired:false,pushMessageId:'',pushDueAt:'',createdAt:new Date().toISOString()};
         const savedCategoryId=categoryId,hasFutureDue=when.getTime()>Date.now();
         if(hasFutureDue)activeReminderPushSchedules.add(reminder.id);
-        const permissionRequestPromise=hasFutureDue&&'Notification' in window&&Notification.permission==='default'?Notification.requestPermission().catch(()=>Notification.permission):Promise.resolve('granted');
+        const permissionRequestPromise=!isKodularNativeWebView&&hasFutureDue&&'Notification' in window&&Notification.permission==='default'?Notification.requestPermission().catch(()=>Notification.permission):Promise.resolve('granted');
         const pushSubscriptionPromise=hasFutureDue?requestReminderPushSubscriptionId(permissionRequestPromise):Promise.resolve('');
         reminderSaveInProgress=true;if(saveButton)saveButton.disabled=true;
         reminders.push(reminder);
@@ -1012,8 +1046,8 @@
             try{
               const subscriptionId=await pushSubscriptionPromise;
               if(!subscriptionId){
-                const permission='Notification' in window?Notification.permission:'unavailable';
-                toast(permission==='granted'?'O Chrome permite notificações, mas o OneSignal não registrou este aparelho.':'Lembrete salvo, mas a permissão de notificações não está concedida neste navegador.');
+                const permission=isKodularNativeWebView?'native-unregistered':('Notification' in window?Notification.permission:'unavailable');
+                toast(isKodularNativeWebView?'Lembrete salvo, mas o OneSignal nativo ainda não registrou este aparelho. Confira as permissões do app.':(permission==='granted'?'O Chrome permite notificações, mas o OneSignal não registrou este aparelho.':'Lembrete salvo, mas a permissão de notificações não está concedida neste navegador.'));
                 return;
               }
               const result=await scheduleRemoteReminder(reminder,subscriptionId);
