@@ -156,7 +156,7 @@
   </style>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
-    window.__kodularNativePushBridge = !!(window.AppInventor && typeof window.AppInventor.getWebViewString === 'function');
+    window.__kodularNativePushBridge = new URLSearchParams(window.location.search).get('nativepush') === '1' && !!(window.AppInventor && typeof window.AppInventor.getWebViewString === 'function');
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     if (!window.__kodularNativePushBridge) {
       window.OneSignalDeferred.push(async function(OneSignal) {
