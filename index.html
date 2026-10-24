@@ -161,7 +161,7 @@
     if (!window.__kodularNativePushBridge) {
       window.OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
-          appId: "e078e43d-0121-444a-a658-b780030a81f4",
+          appId: window.__kodularNativePushBridge ? "e078e43d-0121-444a-a658-b780030a81f4" : "70f063bf-5c2a-4198-a134-646c86ec32c3",
           serviceWorkerPath: "/Despesas-Recorrentes-3/sw.js",
           serviceWorkerParam: { scope: "/Despesas-Recorrentes-3/" }
         });
@@ -383,7 +383,9 @@
         const nextQuery=viewedReminderParams.toString();
         history.replaceState(history.state,'',`${location.pathname}${nextQuery?`?${nextQuery}`:''}${location.hash}`);
       }
-      const remotePushEndpoint='https://despesas-recorrentes-push.ricoquintela74.workers.dev';
+      const nativeRemotePushEndpoint='https://despesas-recorrentes-push.ricoquintela74.workers.dev';
+      const webRemotePushEndpoint='https://despesas-recorrentes-web-push.ricoquintela74.workers.dev';
+      const remotePushEndpoint=window.__kodularNativePushBridge?nativeRemotePushEndpoint:webRemotePushEndpoint;
       const remotePushProject='despesas-recorrentes';
       const remotePushUrl='https://ricoquintela.github.io/Despesas-Recorrentes-3/';
       const activeReminderPushSchedules=new Set();
@@ -475,7 +477,10 @@
       }
       async function cancelRemoteReminder(messageId){
         if(!messageId)return true;
-        try{const result=await remotePushRequest('cancel',{messageId});return Boolean(result.ok&&result.cancelled)}catch(_){return false}
+        try{const result=await remotePushRequest('cancel',{messageId});if(result.ok&&result.cancelled)return true}catch(_){}
+        if(isKodularNativeWebView)return false;
+        const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);
+        try{const response=await fetch(`${nativeRemotePushEndpoint}/cancel`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messageId}),signal:controller.signal});const result=await response.json().catch(()=>({}));return Boolean(response.ok&&result.ok&&result.cancelled)}catch(_){return false}finally{clearTimeout(timeout)}
       }
       const legacyReminderCancellationPromise=Promise.all(legacyReminderMessageIdsToCancel.map(messageId=>cancelRemoteReminder(messageId)));
       async function scheduleRemoteReminder(reminder,subscriptionId,previousMessageId=''){
@@ -486,7 +491,8 @@
           return {scheduled:false,reason};
         }
         try{
-          const result=await remotePushRequest('schedule',{subscriptionId,reminderId:reminder.id,repeat:reminder.repeat,dueAt:due.toISOString(),previousMessageId,project:remotePushProject,expenseName});
+          if(previousMessageId&&!isKodularNativeWebView)await cancelRemoteReminder(previousMessageId);
+          const result=await remotePushRequest('schedule',{subscriptionId,reminderId:reminder.id,repeat:reminder.repeat,dueAt:due.toISOString(),previousMessageId:isKodularNativeWebView?previousMessageId:'',project:remotePushProject,expenseName});
           return {scheduled:true,messageId:result.id,dueAt:due.toISOString()};
         }catch(error){
           if(previousMessageId)await cancelRemoteReminder(previousMessageId);
