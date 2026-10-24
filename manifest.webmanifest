@@ -1,7 +1,7 @@
 {
   "id": "./",
   "name": "Despesas Recorrentes",
-  "short_name": "Despesas",
+  "short_name": "Despesas Recorrentes",
   "description": "Organize suas despesas recorrentes e acompanhe seus pagamentos.",
   "lang": "pt-BR",
   "start_url": "./",
@@ -11,7 +11,17 @@
   "background_color": "#f6f7fb",
   "theme_color": "#5146d8",
   "icons": [
-    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
