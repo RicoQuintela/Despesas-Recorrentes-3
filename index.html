@@ -239,7 +239,7 @@
       <div class="annual-summary-year"><label for="annualSummaryYear">Ano</label><select id="annualSummaryYear" aria-label="Selecionar ano do resumo anual"></select></div>
       <div class="annual-summary-table-wrap"><table class="annual-summary-table"><thead><tr><th scope="col" aria-label="Mês"></th><th scope="col">Depósitos</th><th scope="col">Gastos</th><th scope="col">Saldo Final</th></tr></thead><tbody id="annualSummaryRows"></tbody></table></div>
       <p class="annual-summary-note">Saldo final = depósitos menos gastos pagos.</p>
-      <button class="annual-report-print" id="printAnnualReport" type="button">Imprimir relatório anual detalhado</button>
+      <button class="annual-report-print" id="printAnnualReport" type="button">Salvar / Imprimir</button>
     </section>
   </div>
   <div aria-modal="true" class="modal-backdrop" id="reminderModal" role="dialog">
@@ -470,7 +470,6 @@
  const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
  const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=value=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
- const reportCSS='body{font-family:Arial,sans-serif;color:#111;margin:24px}h1{font-size:22px;margin:0 0 6px}p{font-size:12px;color:#444;margin:0 0 18px}h2{font-size:15px;margin:20px 0 8px;padding-bottom:4px;border-bottom:1px solid #777;break-after:avoid}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:6px 8px;border:1px solid #777;text-align:left}th{background:#eee}.month-section{break-inside:avoid}.empty-month{font-size:11px;color:#555}@media print{body{margin:12mm}}';
  const buildReport=year=>{
    let book={};try{book=JSON.parse(localStorage.getItem('meus-gastos-meses-v1')||'{}')}catch(e){}
    const records=book&&book.months?book.months:book;let total=0;
@@ -481,18 +480,19 @@
      const rows=paid.length?`<table><thead><tr><th>Nome da conta</th><th>Valor</th><th>Dia de vencimento</th><th>Status</th></tr></thead><tbody>${paid.map(item=>`<tr><td>${esc(item.name||'Conta sem nome')}</td><td>${money(item.amount)}</td><td>${item.dueDay?`Dia ${esc(item.dueDay)}`:'Não informado'}</td><td>Pago</td></tr>`).join('')}<tr><th>Total pago no mês</th><th>${money(subtotal)}</th><td colspan="2"></td></tr></tbody></table>`:'<p class="empty-month">Nenhuma conta paga registrada neste mês.</p>';
      return `<section class="month-section"><h2>${label}</h2>${rows}</section>`;
    }).join('');
-   return {year,total,html:`<div class="report-page"><h1>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</h1><p>Contas marcadas como pagas, agrupadas mês a mês, com valor, dia de vencimento e status.</p>${sections}<h2>Total pago no ano: ${money(total)}</h2></div>`};
+   return `<div class="report-page"><h1>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</h1><p class="report-subtitle">Contas marcadas como pagas, agrupadas mês a mês, com valor, dia de vencimento e status.</p>${sections}<h2>Total pago no ano: ${money(total)}</h2></div>`;
  };
- let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
- let chooser=document.getElementById('annualReportActionDialog');
- if(!chooser){chooser=document.createElement('div');chooser.id='annualReportActionDialog';chooser.className='annual-report-action-backdrop';chooser.setAttribute('aria-hidden','true');chooser.innerHTML=`<section class="annual-report-action-card" role="dialog" aria-modal="true" aria-labelledby="annualReportActionTitle"><button type="button" class="annual-report-action-close" aria-label="Fechar">×</button><h2 id="annualReportActionTitle">Relatório detalhado</h2><p>Imprima o relatório ou escolha salvar como PDF nas opções de impressão.</p><button type="button" class="annual-report-action-print">Salvar / Imprimir</button></section>`;document.body.appendChild(chooser)}
- let current=null;
- const close=()=>{chooser.classList.remove('open');chooser.setAttribute('aria-hidden','true')};
- button.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;current=buildReport(year);report.innerHTML=current.html;chooser.classList.add('open');chooser.setAttribute('aria-hidden','false')},true);
- chooser.querySelector('.annual-report-action-close').addEventListener('click',close);
- chooser.addEventListener('click',event=>{if(event.target===chooser)close()});
- chooser.querySelector('.annual-report-action-print').addEventListener('click',()=>{if(!current)return;close();document.body.classList.add('annual-report-print-mode');const cleanup=()=>{document.body.classList.remove('annual-report-print-mode');window.removeEventListener('afterprint',cleanup)};window.addEventListener('afterprint',cleanup);try{window.print()}catch(error){cleanup()}setTimeout(cleanup,3000)});
- document.addEventListener('keydown',event=>{if(event.key==='Escape'&&chooser.classList.contains('open'))close()});
+ button.addEventListener('click',event=>{
+   event.preventDefault();event.stopImmediatePropagation();
+   const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;
+   let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
+   report.innerHTML=buildReport(year);
+   document.body.classList.add('annual-report-print-mode');
+   const cleanup=()=>{document.body.classList.remove('annual-report-print-mode');window.removeEventListener('afterprint',cleanup)};
+   window.addEventListener('afterprint',cleanup);
+   try{window.print()}catch(error){cleanup()}
+   setTimeout(cleanup,3000);
+ },true);
 })();
 </script>
 </body>
