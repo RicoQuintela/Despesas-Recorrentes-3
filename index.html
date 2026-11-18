@@ -78,7 +78,9 @@
     #historyModal .modal{min-height:80dvh;max-height:calc(100dvh - 20px);padding-bottom:44px}
     #historyModal .history-list{max-height:58vh}
     #historyModal #clearHistory{margin-bottom:18px}
-    .annual-summary-modal{max-height:calc(100dvh - 28px);padding-bottom:18px}.annual-summary-year{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0}.annual-summary-year label{flex:0 0 auto;color:#1769ff;font-size:13px;font-weight:800}.annual-summary-year select{width:84px;min-width:84px;padding:7px 8px;border:1px solid #1769ff;border-radius:10px;color:#1769ff;background:var(--white);font-size:12px;font-weight:800;text-align:center}#annualSummaryTitle{color:#007bff!important}#closeAnnualSummary{border:2px solid #e53935!important}.annual-summary-table-wrap{max-height:58vh;overflow:auto;border:2px solid #1769ff;border-radius:11px;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)}.annual-summary-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;white-space:nowrap}.annual-summary-table tbody td{font-size:11px;text-align:center}.annual-summary-table th,.annual-summary-table td{padding:10px 3px;border:1px solid #1769ff;text-align:right;font-variant-numeric:tabular-nums}.annual-summary-table th{position:sticky;top:0;color:var(--ink);background:var(--primary-soft);font-size:12px;font-weight:850;text-align:center}.annual-summary-table th:first-child,.annual-summary-table tbody th{text-align:left;width:20%}.annual-summary-table tbody th{font-weight:800}.annual-summary-table tbody tr:last-child th,.annual-summary-table tbody tr:last-child td{border-bottom:1px solid #1769ff}.annual-summary-note{margin:9px 0 0!important;font-size:10px!important}
+    .annual-summary-modal{max-height:calc(100dvh - 28px);padding-bottom:18px}.annual-summary-year{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0}.annual-summary-year label{flex:0 0 auto;color:#1769ff;font-size:13px;font-weight:800}.annual-summary-year select{width:84px;min-width:84px;padding:7px 8px;border:1px solid #1769ff;border-radius:10px;color:#1769ff;background:var(--white);font-size:12px;font-weight:800;text-align:center}#annualSummaryTitle{color:#007bff!important}#closeAnnualSummary{border:2px solid #e53935!important}.annual-summary-table-wrap{max-height:58vh;overflow:auto;border:2px solid #1769ff;border-radius:11px;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)}.annual-summary-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;white-space:nowrap}.annual-summary-table tbody td{font-size:11px;text-align:center}.annual-summary-table th,.annual-summary-table td{padding:10px 3px;border:1px solid #1769ff;text-align:right;font-variant-numeric:tabular-nums}.annual-summary-table th{position:sticky;top:0;color:var(--ink);background:var(--primary-soft);font-size:12px;font-weight:850;text-align:center}.annual-summary-table th:first-child,.annual-summary-table tbody th{text-align:left;width:20%}.annual-summary-table tbody th{font-weight:800}.annual-summary-table tbody tr:last-child th,.annual-summary-table tbody tr:last-child td{border-bottom:1px solid #1769ff}.annual-summary-note{margin:9px 0 0!important;font-size:10px!important}.annual-report-print{display:block;width:100%;margin:12px 0 0;padding:12px;border:1px solid #000;border-radius:11px;color:#fff;background:#1769ff;font-size:13px;font-weight:850}.annual-report-print:active{transform:scale(.99)}
+    @media print{body.annual-report-print-mode{margin:0;padding:0;background:#fff!important;color:#111!important;font-family:Arial,sans-serif}body.annual-report-print-mode> :not(#annualPrintReport){display:none!important}body.annual-report-print-mode>#annualPrintReport{display:block!important}.annual-report-print-mode .report-page{max-width:none;margin:0;padding:0}.annual-report-print-mode h1{margin:0 0 5px;font-size:20px}.annual-report-print-mode .report-subtitle{margin:0 0 18px;color:#444;font-size:11px}.annual-report-print-mode h2{margin:18px 0 7px;padding-bottom:4px;border-bottom:1px solid #777;font-size:14px;text-transform:capitalize;break-after:avoid}.annual-report-print-mode table{width:100%;border-collapse:collapse;font-size:10px}.annual-report-print-mode th,.annual-report-print-mode td{padding:5px 7px;border:1px solid #777;text-align:left}.annual-report-print-mode th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.annual-report-print-mode .empty-month{font-size:10px;color:#555}.annual-report-print-mode .month-section{break-inside:avoid}}
+    @media screen{#annualPrintReport{display:none}}
     #openHistory,#openAnnualSummary,#addIncome,#addExpense{border:2px solid #1769ff!important;border-radius:14px;color:#1769ff!important;background:#dff1ff!important;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)!important}#addIncome{background:#e4f8ec!important}#addExpense{background:#ffe7eb!important}
   
     /* Reminder module restored from the saved version */
@@ -236,6 +238,7 @@
       <div class="annual-summary-year"><label for="annualSummaryYear">Ano</label><select id="annualSummaryYear" aria-label="Selecionar ano do resumo anual"></select></div>
       <div class="annual-summary-table-wrap"><table class="annual-summary-table"><thead><tr><th scope="col" aria-label="Mês"></th><th scope="col">Depósitos</th><th scope="col">Gastos</th><th scope="col">Saldo Final</th></tr></thead><tbody id="annualSummaryRows"></tbody></table></div>
       <p class="annual-summary-note">Saldo final = depósitos menos gastos pagos.</p>
+      <button class="annual-report-print" id="printAnnualReport" type="button">Imprimir relatório anual detalhado</button>
     </section>
   </div>
   <div aria-modal="true" class="modal-backdrop" id="reminderModal" role="dialog">
@@ -455,6 +458,33 @@
       });
     }
   </script>
+<script>
+(()=>{
+ const button=document.getElementById('printAnnualReport');
+ if(!button)return;
+ const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const money=value=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
+ button.addEventListener('click',()=>{
+   const year=Number(document.getElementById('annualSummaryYear').value);
+   let book={};try{book=JSON.parse(localStorage.getItem('meus-gastos-meses-v1')||'{}')}catch(e){}
+   const records=book&&book.months?book.months:book;
+   let total=0;
+   const sections=months.map((label,index)=>{
+     const key=`${year}-${String(index+1).padStart(2,'0')}`,month=records&&records[key],items=Array.isArray(month?.categories)?month.categories:[];
+     const paid=items.filter(item=>item&&item.status==='paid');
+     const subtotal=paid.reduce((sum,item)=>sum+(Number(item.amount)||0),0);total+=subtotal;
+     const rows=paid.length?`<table><thead><tr><th>Nome da conta</th><th>Valor</th><th>Dia de vencimento</th><th>Status</th></tr></thead><tbody>${paid.map(item=>`<tr><td>${esc(item.name||'Conta sem nome')}</td><td>${money(item.amount)}</td><td>${item.dueDay?`Dia ${esc(item.dueDay)}`:'Não informado'}</td><td>Pago</td></tr>`).join('')}<tr><th>Total pago no mês</th><th>${money(subtotal)}</th><td colspan="2"></td></tr></tbody></table>`:'<p class="empty-month">Nenhuma conta paga registrada neste mês.</p>';
+     return `<section class="month-section"><h2>${label}</h2>${rows}</section>`;
+   }).join('');
+   let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
+   report.innerHTML=`<div class="report-page"><h1>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</h1><p class="report-subtitle">Contas marcadas como pagas, agrupadas mês a mês, com valor, dia de vencimento e status.</p>${sections}<h2>Total pago no ano: ${money(total)}</h2></div>`;
+   document.body.classList.add('annual-report-print-mode');
+   const cleanup=()=>{document.body.classList.remove('annual-report-print-mode');window.removeEventListener('afterprint',cleanup)};
+   window.addEventListener('afterprint',cleanup);window.print();setTimeout(cleanup,1500);
+ });
+})();
+</script>
 </body>
 </html>
  
