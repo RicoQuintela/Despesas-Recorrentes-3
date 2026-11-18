@@ -79,6 +79,7 @@
     #historyModal .history-list{max-height:58vh}
     #historyModal #clearHistory{margin-bottom:18px}
     .annual-summary-modal{max-height:calc(100dvh - 28px);padding-bottom:18px}.annual-summary-year{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0}.annual-summary-year label{flex:0 0 auto;color:#1769ff;font-size:13px;font-weight:800}.annual-summary-year select{width:84px;min-width:84px;padding:7px 8px;border:1px solid #1769ff;border-radius:10px;color:#1769ff;background:var(--white);font-size:12px;font-weight:800;text-align:center}#annualSummaryTitle{color:#007bff!important}#closeAnnualSummary{border:2px solid #e53935!important}.annual-summary-table-wrap{max-height:58vh;overflow:auto;border:2px solid #1769ff;border-radius:11px;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)}.annual-summary-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;white-space:nowrap}.annual-summary-table tbody td{font-size:11px;text-align:center}.annual-summary-table th,.annual-summary-table td{padding:10px 3px;border:1px solid #1769ff;text-align:right;font-variant-numeric:tabular-nums}.annual-summary-table th{position:sticky;top:0;color:var(--ink);background:var(--primary-soft);font-size:12px;font-weight:850;text-align:center}.annual-summary-table th:first-child,.annual-summary-table tbody th{text-align:left;width:20%}.annual-summary-table tbody th{font-weight:800}.annual-summary-table tbody tr:last-child th,.annual-summary-table tbody tr:last-child td{border-bottom:1px solid #1769ff}.annual-summary-note{margin:9px 0 0!important;font-size:10px!important}.annual-report-print{display:block;width:100%;margin:12px 0 0;padding:12px;border:1px solid #000;border-radius:11px;color:#fff;background:#1769ff;font-size:13px;font-weight:850}.annual-report-print:active{transform:scale(.99)}
+    .annual-report-action-backdrop{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(10,14,30,.62)}.annual-report-action-backdrop.open{display:flex}.annual-report-action-card{position:relative;width:min(100%,420px);padding:24px 20px 18px;border:2px solid #1769ff;border-radius:20px;background:#fff;box-shadow:0 16px 45px rgba(0,0,0,.25);text-align:center}.annual-report-action-card h2{margin:0 32px 8px;color:#007bff;font-size:20px}.annual-report-action-card p{margin:0 0 16px;color:#5d6270;font-size:13px}.annual-report-action-close{position:absolute;top:10px;right:10px;width:34px;height:34px;border:2px solid #e53935;border-radius:50%;background:#fff;color:#222;font-size:22px}.annual-report-action-print,.annual-report-action-save{display:block;width:100%;margin:9px 0;padding:13px 10px;border:1px solid #111;border-radius:11px;color:#fff;background:#1769ff;font-size:14px;font-weight:850}.annual-report-action-save{color:#1769ff;background:#fff}.annual-report-action-card small{display:block;margin-top:12px;color:#606575;font-size:11px;line-height:1.45}
     @media print{body.annual-report-print-mode{margin:0;padding:0;background:#fff!important;color:#111!important;font-family:Arial,sans-serif}body.annual-report-print-mode> :not(#annualPrintReport){display:none!important}body.annual-report-print-mode>#annualPrintReport{display:block!important}.annual-report-print-mode .report-page{max-width:none;margin:0;padding:0}.annual-report-print-mode h1{margin:0 0 5px;font-size:20px}.annual-report-print-mode .report-subtitle{margin:0 0 18px;color:#444;font-size:11px}.annual-report-print-mode h2{margin:18px 0 7px;padding-bottom:4px;border-bottom:1px solid #777;font-size:14px;text-transform:capitalize;break-after:avoid}.annual-report-print-mode table{width:100%;border-collapse:collapse;font-size:10px}.annual-report-print-mode th,.annual-report-print-mode td{padding:5px 7px;border:1px solid #777;text-align:left}.annual-report-print-mode th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.annual-report-print-mode .empty-month{font-size:10px;color:#555}.annual-report-print-mode .month-section{break-inside:avoid}}
     @media screen{#annualPrintReport{display:none}}
     #openHistory,#openAnnualSummary,#addIncome,#addExpense{border:2px solid #1769ff!important;border-radius:14px;color:#1769ff!important;background:#dff1ff!important;box-shadow:0 0 0 1px rgba(23,105,255,.14),0 0 6px rgba(23,105,255,.24)!important}#addIncome{background:#e4f8ec!important}#addExpense{background:#ffe7eb!important}
@@ -460,16 +461,14 @@
   </script>
 <script>
 (()=>{
- const button=document.getElementById('printAnnualReport');
- if(!button)return;
+ const button=document.getElementById('printAnnualReport');if(!button)return;
  const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
  const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=value=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
- button.addEventListener('click',()=>{
-   const year=Number(document.getElementById('annualSummaryYear').value);
+ const reportCSS='body{font-family:Arial,sans-serif;color:#111;margin:24px}h1{font-size:22px;margin:0 0 6px}p{font-size:12px;color:#444;margin:0 0 18px}h2{font-size:15px;margin:20px 0 8px;padding-bottom:4px;border-bottom:1px solid #777;break-after:avoid}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:6px 8px;border:1px solid #777;text-align:left}th{background:#eee}.month-section{break-inside:avoid}.empty-month{font-size:11px;color:#555}@media print{body{margin:12mm}}';
+ const buildReport=year=>{
    let book={};try{book=JSON.parse(localStorage.getItem('meus-gastos-meses-v1')||'{}')}catch(e){}
-   const records=book&&book.months?book.months:book;
-   let total=0;
+   const records=book&&book.months?book.months:book;let total=0;
    const sections=months.map((label,index)=>{
      const key=`${year}-${String(index+1).padStart(2,'0')}`,month=records&&records[key],items=Array.isArray(month?.categories)?month.categories:[];
      const paid=items.filter(item=>item&&item.status==='paid');
@@ -477,12 +476,19 @@
      const rows=paid.length?`<table><thead><tr><th>Nome da conta</th><th>Valor</th><th>Dia de vencimento</th><th>Status</th></tr></thead><tbody>${paid.map(item=>`<tr><td>${esc(item.name||'Conta sem nome')}</td><td>${money(item.amount)}</td><td>${item.dueDay?`Dia ${esc(item.dueDay)}`:'Não informado'}</td><td>Pago</td></tr>`).join('')}<tr><th>Total pago no mês</th><th>${money(subtotal)}</th><td colspan="2"></td></tr></tbody></table>`:'<p class="empty-month">Nenhuma conta paga registrada neste mês.</p>';
      return `<section class="month-section"><h2>${label}</h2>${rows}</section>`;
    }).join('');
-   let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
-   report.innerHTML=`<div class="report-page"><h1>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</h1><p class="report-subtitle">Contas marcadas como pagas, agrupadas mês a mês, com valor, dia de vencimento e status.</p>${sections}<h2>Total pago no ano: ${money(total)}</h2></div>`;
-   document.body.classList.add('annual-report-print-mode');
-   const cleanup=()=>{document.body.classList.remove('annual-report-print-mode');window.removeEventListener('afterprint',cleanup)};
-   window.addEventListener('afterprint',cleanup);window.print();setTimeout(cleanup,1500);
- });
+   return {year,total,html:`<div class="report-page"><h1>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</h1><p>Contas marcadas como pagas, agrupadas mês a mês, com valor, dia de vencimento e status.</p>${sections}<h2>Total pago no ano: ${money(total)}</h2></div>`};
+ };
+ let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
+ let chooser=document.getElementById('annualReportActionDialog');
+ if(!chooser){chooser=document.createElement('div');chooser.id='annualReportActionDialog';chooser.className='annual-report-action-backdrop';chooser.setAttribute('aria-hidden','true');chooser.innerHTML=`<section class="annual-report-action-card" role="dialog" aria-modal="true" aria-labelledby="annualReportActionTitle"><button type="button" class="annual-report-action-close" aria-label="Fechar">×</button><h2 id="annualReportActionTitle">Relatório detalhado</h2><p>Escolha como deseja obter o relatório do ano selecionado.</p><button type="button" class="annual-report-action-print">Imprimir / Salvar como PDF</button><button type="button" class="annual-report-action-save">Baixar relatório</button><small>“Imprimir / Salvar como PDF” abre as opções de impressão do aparelho. “Baixar relatório” salva um arquivo HTML que pode ser aberto e impresso depois.</small></section>`;document.body.appendChild(chooser)}
+ let current=null;
+ const close=()=>{chooser.classList.remove('open');chooser.setAttribute('aria-hidden','true')};
+ button.addEventListener('click',()=>{const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;current=buildReport(year);report.innerHTML=current.html;chooser.classList.add('open');chooser.setAttribute('aria-hidden','false')});
+ chooser.querySelector('.annual-report-action-close').addEventListener('click',close);
+ chooser.addEventListener('click',event=>{if(event.target===chooser)close()});
+ chooser.querySelector('.annual-report-action-print').addEventListener('click',()=>{if(!current)return;close();document.body.classList.add('annual-report-print-mode');const cleanup=()=>{document.body.classList.remove('annual-report-print-mode');window.removeEventListener('afterprint',cleanup)};window.addEventListener('afterprint',cleanup);window.print();setTimeout(cleanup,1500)});
+ chooser.querySelector('.annual-report-action-save').addEventListener('click',()=>{if(!current)return;const page=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório Detalhado de Despesas Recorrentes - Ano ${current.year}</title><style>${reportCSS}</style></head><body>${current.html}</body></html>`;const blob=new Blob([page],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Relatorio-Detalhado-Despesas-Recorrentes-${current.year}.html`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);close()});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&chooser.classList.contains('open'))close()});
 })();
 </script>
 </body>
