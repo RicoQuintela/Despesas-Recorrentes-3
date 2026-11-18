@@ -521,10 +521,8 @@
    const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;
    const fragment=buildReport(year);
    const documentHtml=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</title><style>body{font-family:Arial,sans-serif;color:#111;margin:20px}h1{font-size:22px}h2{font-size:15px;margin-top:20px;padding-bottom:5px;border-bottom:1px solid #777;break-after:avoid}p{font-size:12px;color:#444}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:6px 8px;border:1px solid #777;text-align:left}th{background:#eee}.month-section{break-inside:avoid}.empty-month{font-size:11px;color:#555}@media print{body{margin:12mm}}</style></head><body>${fragment}</body></html>`;
-   const bridge=window.Kodular||window.AppInventor;
-   if(bridge&&typeof bridge.setWebViewString==='function'){
-     try{bridge.setWebViewString(documentHtml);return}catch(error){}
-   }
+   // APKs built from the older project do not have the native bridge. Always use
+   // the report PDF path instead of returning silently to an unhandled WebViewString.
    openAnnualReportPdf(year);
  },true);
 })();
