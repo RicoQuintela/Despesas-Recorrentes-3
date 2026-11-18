@@ -519,14 +519,13 @@
  button.addEventListener('click',event=>{
    event.preventDefault();event.stopImmediatePropagation();
    const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;
-   let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
-   report.innerHTML=buildReport(year);
-   document.body.classList.remove('annual-report-print-mode');
-   document.body.classList.add('annual-report-show-screen');
-   let toolbar=document.getElementById('annualReportScreenToolbar');
-   if(!toolbar){toolbar=document.createElement('div');toolbar.id='annualReportScreenToolbar';toolbar.innerHTML='<button type="button" id="annualReportTryPrint">Imprimir / Salvar como PDF</button><button type="button" id="annualReportCloseScreen">Voltar ao resumo</button>';report.prepend(toolbar);toolbar.querySelector('#annualReportTryPrint').style.cssText='display:block;width:100%;margin:0 0 8px;padding:12px;border:0;border-radius:10px;background:#1769ff;color:white;font-size:15px;font-weight:800';toolbar.querySelector('#annualReportCloseScreen').style.cssText='display:block;width:100%;margin:0 0 16px;padding:10px;border:1px solid #1769ff;border-radius:10px;background:white;color:#1769ff;font-size:14px;font-weight:800';toolbar.querySelector('#annualReportCloseScreen').addEventListener('click',()=>document.body.classList.remove('annual-report-show-screen'));toolbar.querySelector('#annualReportTryPrint').addEventListener('click',()=>openAnnualReportPdf(year))}
-   report.setAttribute('role','region');report.setAttribute('aria-label','Relatório anual detalhado');
-   try{window.print()}catch(error){}
+   const fragment=buildReport(year);
+   const documentHtml=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</title><style>body{font-family:Arial,sans-serif;color:#111;margin:20px}h1{font-size:22px}h2{font-size:15px;margin-top:20px;padding-bottom:5px;border-bottom:1px solid #777;break-after:avoid}p{font-size:12px;color:#444}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:6px 8px;border:1px solid #777;text-align:left}th{background:#eee}.month-section{break-inside:avoid}.empty-month{font-size:11px;color:#555}@media print{body{margin:12mm}}</style></head><body>${fragment}</body></html>`;
+   const bridge=window.Kodular||window.AppInventor;
+   if(bridge&&typeof bridge.setWebViewString==='function'){
+     try{bridge.setWebViewString(documentHtml);return}catch(error){}
+   }
+   openAnnualReportPdf(year);
  },true);
 })();
 </script>
