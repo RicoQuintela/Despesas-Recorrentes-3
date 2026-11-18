@@ -454,8 +454,13 @@
  
   <script>
     if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!sessionStorage.getItem('despesas-sw-updated')) {
+          sessionStorage.setItem('despesas-sw-updated', '1'); location.reload();
+        }
+      });
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+        navigator.serviceWorker.register('./sw.js', { scope: './' }).then(r => r.update()).catch(() => {});
       });
     }
   </script>
@@ -480,14 +485,14 @@
  };
  let report=document.getElementById('annualPrintReport');if(!report){report=document.createElement('div');report.id='annualPrintReport';document.body.appendChild(report)}
  let chooser=document.getElementById('annualReportActionDialog');
- if(!chooser){chooser=document.createElement('div');chooser.id='annualReportActionDialog';chooser.className='annual-report-action-backdrop';chooser.setAttribute('aria-hidden','true');chooser.innerHTML=`<section class="annual-report-action-card" role="dialog" aria-modal="true" aria-labelledby="annualReportActionTitle"><button type="button" class="annual-report-action-close" aria-label="Fechar">×</button><h2 id="annualReportActionTitle">Relatório detalhado</h2><p>Escolha como deseja obter o relatório do ano selecionado.</p><button type="button" class="annual-report-action-print">Imprimir / Salvar como PDF</button><button type="button" class="annual-report-action-save">Baixar relatório</button><small>“Imprimir / Salvar como PDF” abre as opções de impressão do aparelho. “Baixar relatório” salva um arquivo HTML que pode ser aberto e impresso depois.</small></section>`;document.body.appendChild(chooser)}
+ if(!chooser){chooser=document.createElement('div');chooser.id='annualReportActionDialog';chooser.className='annual-report-action-backdrop';chooser.setAttribute('aria-hidden','true');chooser.innerHTML=`<section class="annual-report-action-card" role="dialog" aria-modal="true" aria-labelledby="annualReportActionTitle"><button type="button" class="annual-report-action-close" aria-label="Fechar">×</button><h2 id="annualReportActionTitle">Relatório detalhado</h2><p>Escolha como deseja obter o relatório do ano selecionado.</p><button type="button" class="annual-report-action-print">Imprimir / Salvar como PDF</button><button type="button" class="annual-report-action-save">Salvar/Compartilhar relatório</button><small>“Imprimir / Salvar como PDF” abre as opções de impressão do aparelho. “Salvar/Compartilhar relatório” permite salvar o arquivo ou enviá-lo pelo menu do celular.</small></section>`;document.body.appendChild(chooser)}
  let current=null;
  const close=()=>{chooser.classList.remove('open');chooser.setAttribute('aria-hidden','true')};
  button.addEventListener('click',()=>{const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;current=buildReport(year);report.innerHTML=current.html;chooser.classList.add('open');chooser.setAttribute('aria-hidden','false')});
  chooser.querySelector('.annual-report-action-close').addEventListener('click',close);
  chooser.addEventListener('click',event=>{if(event.target===chooser)close()});
  chooser.querySelector('.annual-report-action-print').addEventListener('click',()=>{if(!current)return;close();document.body.classList.add('annual-report-print-mode');const cleanup=()=>{document.body.classList.remove('annual-report-print-mode');window.removeEventListener('afterprint',cleanup)};window.addEventListener('afterprint',cleanup);window.print();setTimeout(cleanup,1500)});
- chooser.querySelector('.annual-report-action-save').addEventListener('click',()=>{if(!current)return;const page=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório Detalhado de Despesas Recorrentes - Ano ${current.year}</title><style>${reportCSS}</style></head><body>${current.html}</body></html>`;const blob=new Blob([page],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Relatorio-Detalhado-Despesas-Recorrentes-${current.year}.html`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);close()});
+ chooser.querySelector('.annual-report-action-save').addEventListener('click',async()=>{if(!current)return;const page=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório Detalhado de Despesas Recorrentes - Ano ${current.year}</title><style>${reportCSS}</style></head><body>${current.html}</body></html>`;const filename=`Relatorio-Detalhado-Despesas-Recorrentes-${current.year}.html`,file=new File([page],filename,{type:'text/html'});close();try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:`Relatório de despesas ${current.year}`});return}}catch(error){if(error&&error.name==='AbortError')return}const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=filename;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)});
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&chooser.classList.contains('open'))close()});
 })();
 </script>
