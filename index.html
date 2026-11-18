@@ -239,7 +239,7 @@
       <div class="annual-summary-year"><label for="annualSummaryYear">Ano</label><select id="annualSummaryYear" aria-label="Selecionar ano do resumo anual"></select></div>
       <div class="annual-summary-table-wrap"><table class="annual-summary-table"><thead><tr><th scope="col" aria-label="Mês"></th><th scope="col">Depósitos</th><th scope="col">Gastos</th><th scope="col">Saldo Final</th></tr></thead><tbody id="annualSummaryRows"></tbody></table></div>
       <p class="annual-summary-note">Saldo final = depósitos menos gastos pagos.</p>
-      <button class="annual-report-print" id="printAnnualReport" type="button">Salvar / Imprimir</button>
+      
     </section>
   </div>
   <div aria-modal="true" class="modal-backdrop" id="reminderModal" role="dialog">
@@ -464,69 +464,7 @@
       });
     }
   </script>
-<script>
-(()=>{
- const button=document.getElementById('printAnnualReport');if(!button)return;
- const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
- const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const money=value=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
- const moneyPdf=value=>money(value).replace(/R\$\s*/,'R$ ');
- const buildReport=year=>{
-   let book={};try{book=JSON.parse(localStorage.getItem('meus-gastos-meses-v1')||'{}')}catch(e){}
-   const records=book&&book.months?book.months:book;let total=0;
-   const sections=months.map((label,index)=>{
-     const key=`${year}-${String(index+1).padStart(2,'0')}`,month=records&&records[key],items=Array.isArray(month?.categories)?month.categories:[];
-     const paid=items.filter(item=>item&&item.status==='paid');
-     const subtotal=paid.reduce((sum,item)=>sum+(Number(item.amount)||0),0);total+=subtotal;
-     const rows=paid.length?`<table><thead><tr><th>Nome da conta</th><th>Valor</th><th>Dia de vencimento</th><th>Status</th></tr></thead><tbody>${paid.map(item=>`<tr><td>${esc(item.name||'Conta sem nome')}</td><td>${money(item.amount)}</td><td>${item.dueDay?`Dia ${esc(item.dueDay)}`:'Não informado'}</td><td>Pago</td></tr>`).join('')}<tr><th>Total pago no mês</th><th>${money(subtotal)}</th><td colspan="2"></td></tr></tbody></table>`:'<p class="empty-month">Nenhuma conta paga registrada neste mês.</p>';
-     return `<section class="month-section"><h2>${label}</h2>${rows}</section>`;
-   }).join('');
-   return `<div class="report-page"><h1>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</h1><p class="report-subtitle">Contas marcadas como pagas, agrupadas mês a mês, com valor, dia de vencimento e status.</p>${sections}<h2>Total pago no ano: ${money(total)}</h2></div>`;
- };
- const ascii=value=>String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[–—]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[^\x20-\x7E]/g,'?');
- const pdfEscape=value=>ascii(value).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
- const openAnnualReportPdf=year=>{
-   let book={};try{book=JSON.parse(localStorage.getItem('meus-gastos-meses-v1')||'{}')}catch(e){}
-   const records=book&&book.months?book.months:book;
-   const lines=[{text:`Relatorio Detalhado de Despesas Recorrentes - Ano ${year}`,bold:true},{text:'Contas marcadas como pagas - mes a mes',bold:false},{text:'',bold:false}];
-   let total=0;
-   months.forEach((label,index)=>{
-     const key=`${year}-${String(index+1).padStart(2,'0')}`,month=records&&records[key],items=Array.isArray(month?.categories)?month.categories:[];
-     const paid=items.filter(item=>item&&item.status==='paid');
-     const subtotal=paid.reduce((sum,item)=>sum+(Number(item.amount)||0),0);total+=subtotal;
-     lines.push({text:label,bold:true});
-     if(!paid.length) lines.push({text:'Nenhuma conta paga registrada neste mes.',bold:false});
-     else {
-       lines.push({text:'Conta | Valor | Vencimento | Status',bold:true});
-       paid.forEach(item=>lines.push({text:`${item.name||'Conta sem nome'} | ${moneyPdf(item.amount)} | ${item.dueDay?`Dia ${item.dueDay}`:'Nao informado'} | Pago`,bold:false}));
-       lines.push({text:`Total pago no mes: ${moneyPdf(subtotal)}`,bold:true});
-     }
-     lines.push({text:'',bold:false});
-   });
-   lines.push({text:`TOTAL PAGO NO ANO: ${moneyPdf(total)}`,bold:true});
-   const wrapped=[];lines.forEach(line=>{const text=ascii(line.text),max=78;if(!text){wrapped.push(line);return}for(let i=0;i<text.length;i+=max)wrapped.push({text:text.slice(i,i+max),bold:line.bold})});
-   const pages=[];let pageLines=[],y=790;wrapped.forEach(line=>{if(y<48){pages.push(pageLines);pageLines=[];y=790}pageLines.push(`BT /${line.bold?'F2':'F1'} ${line.bold?11:10} Tf 48 ${y} Td (${pdfEscape(line.text)}) Tj ET`);y-=15});if(pageLines.length)pages.push(pageLines);
-   const objects=[];const add=obj=>{objects.push(obj);return objects.length};
-   const catalogId=add('');const pagesId=add('');const f1=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');const f2=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
-   const pageIds=[];pages.forEach(content=>{const stream=content.join('\n'),contentId=add(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`),pageId=add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${f1} 0 R /F2 ${f2} 0 R >> >> /Contents ${contentId} 0 R >>`);pageIds.push(pageId)});
-   objects[catalogId-1]=`<< /Type /Catalog /Pages ${pagesId} 0 R >>`;objects[pagesId-1]=`<< /Type /Pages /Kids [${pageIds.map(id=>`${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
-   let pdf='%PDF-1.4\n';const offsets=[0];objects.forEach((obj,i)=>{offsets.push(pdf.length);pdf+=`${i+1} 0 obj\n${obj}\nendobj\n`});const xref=pdf.length;pdf+=`xref\n0 ${objects.length+1}\n0000000000 65535 f \n`;for(let i=1;i<offsets.length;i++)pdf+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;pdf+=`trailer\n<< /Size ${objects.length+1} /Root ${catalogId} 0 R >>\nstartxref\n${xref}\n%%EOF`;
-   const blob=new Blob([pdf],{type:'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-   a.href=url;a.download=`Relatorio-Detalhado-Despesas-Recorrentes-${year}.pdf`;a.style.display='none';document.body.appendChild(a);a.click();a.remove();
-   setTimeout(()=>{try{window.open(url,'_blank')}catch(e){}},500);
-   setTimeout(()=>URL.revokeObjectURL(url),120000);
- };
- button.addEventListener('click',event=>{
-   event.preventDefault();event.stopImmediatePropagation();
-   const year=Number(document.getElementById('annualSummaryYear').value);if(!Number.isInteger(year))return;
-   const fragment=buildReport(year);
-   const documentHtml=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório Detalhado de Despesas Recorrentes - Ano ${year}</title><style>body{font-family:Arial,sans-serif;color:#111;margin:20px}h1{font-size:22px}h2{font-size:15px;margin-top:20px;padding-bottom:5px;border-bottom:1px solid #777;break-after:avoid}p{font-size:12px;color:#444}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:6px 8px;border:1px solid #777;text-align:left}th{background:#eee}.month-section{break-inside:avoid}.empty-month{font-size:11px;color:#555}@media print{body{margin:12mm}}</style></head><body>${fragment}</body></html>`;
-   // APKs built from the older project do not have the native bridge. Always use
-   // the report PDF path instead of returning silently to an unhandled WebViewString.
-   openAnnualReportPdf(year);
- },true);
-})();
-</script>
+
 </body>
 </html>
  
