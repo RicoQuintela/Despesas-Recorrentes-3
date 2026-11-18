@@ -1,5 +1,5 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const VERSION = 'despesas-recorrentes-v19';
+const VERSION = 'despesas-recorrentes-v20';
 const BASE = new URL('./', self.registration.scope);
 const CORE = [
   BASE.href,
